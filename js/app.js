@@ -282,3 +282,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 });
+document.getElementById("btnFetchUrl").addEventListener("click", async () => {
+  const url = document.getElementById("autoNewsUrl").value.trim();
+  if (!url) {
+    alert("請先輸入新聞網址！");
+    return;
+  }
+
+  const btn = document.getElementById("btnFetchUrl");
+  btn.disabled = true;
+  btn.textContent = "擷取中...";
+
+  try {
+    const data = await window.P135_API.scrapeNewsUrl(url);
+
+    // 自動填入工作台左欄
+    document.getElementById("newsTitle").value = data.title || "";
+    document.getElementById("newsMedia").value = data.media || "";
+    document.getElementById("newsDate").value = data.date || "";
+    document.getElementById("newsUrl").value = url;
+    document.getElementById("newsContent").value = data.content || "";
+
+    alert(`成功擷取【${data.media}】報導！請檢查內容無誤後，即可點擊開始解讀。`);
+  } catch (err) {
+    alert("自動擷取失敗：" + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "抓取新聞";
+  }
+});
