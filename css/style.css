@@ -378,3 +378,18 @@ textarea {
 .drawer-overlay.open {
   display: block;
 }
+/* 中欄上方網址快速擷取列 */
+.url-scrape-bar {
+  display: flex;
+  gap: 8px;
+  background-color: #171c24;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 14px;
+}
+
+.url-scrape-bar input {
+  flex: 1;
+  font-size: 0.85rem;
+}
