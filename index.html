@@ -25,6 +25,15 @@
 
   <!-- 三欄工作台 -->
   <main class="workspace-container">
+<div class="form-group" style="background:#171c24; padding:10px; border-radius:6px; border:1px solid #3b82f6;">
+  <label for="autoNewsUrl" style="color:#60a5fa; font-weight:600;">🔗 貼入新聞網址自動擷取 (自由 / 聯合 / 中時)</label>
+  <div style="display:flex; gap:8px; margin-top:4px;">
+    <input type="url" id="autoNewsUrl" class="flex-1" placeholder="https://news.ltn.com.tw/... 或 https://udn.com/...">
+    <button id="btnFetchUrl" class="btn btn-primary btn-sm">抓取新聞</button>
+  </div>
+</div>
+
+    
     <!-- 左欄：輸入區 -->
     <section class="panel panel-left">
       <h2>1. 新聞原文與來源</h2>
