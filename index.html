@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P135 翻轉新聞 FlipNews</title>
-  <link rel="stylesheet" href="css/style.css?v=v3.3.1">
+  <link rel="stylesheet" href="css/style.css?v=v3.3.2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
@@ -19,22 +19,13 @@
       <button id="btnNewArticle" class="btn btn-primary btn-sm">✏️ 開啟新解讀</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入 / 註冊</button>
-      <span class="version-tag">v3.3.1</span>
+      <span class="version-tag">v3.3.2</span>
     </div>
   </header>
 
   <!-- 三欄工作台 -->
   <main class="workspace-container">
-<div class="form-group" style="background:#171c24; padding:10px; border-radius:6px; border:1px solid #3b82f6;">
-  <label for="autoNewsUrl" style="color:#60a5fa; font-weight:600;">🔗 貼入新聞網址自動擷取 (自由 / 聯合 / 中時)</label>
-  <div style="display:flex; gap:8px; margin-top:4px;">
-    <input type="url" id="autoNewsUrl" class="flex-1" placeholder="https://news.ltn.com.tw/... 或 https://udn.com/...">
-    <button id="btnFetchUrl" class="btn btn-primary btn-sm">抓取新聞</button>
-  </div>
-</div>
-
-    
-    <!-- 左欄：輸入區 -->
+    <!-- 【左欄：原文與來源】 -->
     <section class="panel panel-left">
       <h2>1. 新聞原文與來源</h2>
       <div class="form-group">
@@ -64,8 +55,14 @@
       </div>
     </section>
 
-    <!-- 中欄：解讀對照區 -->
+    <!-- 【中欄：網址解析 + 多維度對照】 -->
     <section class="panel panel-center">
+      <!-- 移至中欄頂部的 URL 自動擷取工具條 -->
+      <div class="url-scrape-bar">
+        <input type="url" id="autoNewsUrl" placeholder="🔗 貼入新聞網址 (自由 / 聯合 / 中時)...">
+        <button id="btnFetchUrl" class="btn btn-secondary btn-sm">抓取填入</button>
+      </div>
+
       <h2>2. 多維度對照面板</h2>
       <div class="tab-header">
         <button class="tab-btn active" data-tab="tabNeutral">中性客觀改寫</button>
@@ -106,7 +103,7 @@
       </div>
     </section>
 
-    <!-- 右欄：個人研判與履歷存檔 -->
+    <!-- 【右欄：個人研判與事蹟存檔】 -->
     <section class="panel panel-right">
       <h2>3. 我的研判與事蹟存檔</h2>
       <div class="form-group">
@@ -143,7 +140,7 @@
     </section>
   </main>
 
-  <!-- 歷史清單側邊欄抽屜 (Drawer) -->
+  <!-- 歷史清單抽屜 -->
   <aside id="historyDrawer" class="history-drawer">
     <div class="drawer-header">
       <h3>📚 歷史解讀文章庫</h3>
@@ -157,8 +154,9 @@
   </aside>
   <div id="drawerOverlay" class="drawer-overlay"></div>
 
-  <script src="config.js?v=v3.3.1"></script>
-  <script src="js/supabase-client.js?v=v3.3.1"></script>
-  <script src="js/app.js?v=v3.3.1"></script>
+  <!-- 載入腳本 (Cache Busting) -->
+  <script src="config.js?v=v3.3.2"></script>
+  <script src="js/supabase-client.js?v=v3.3.2"></script>
+  <script src="js/app.js?v=v3.3.2"></script>
 </body>
 </html>
