@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P135 翻轉新聞 FlipNews</title>
-  <link rel="stylesheet" href="css/style.css?v=V0.0003">
+  <link rel="stylesheet" href="css/style.css?v=V0.0004">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
@@ -18,7 +18,7 @@
       <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入 / 註冊</button>
-      <span id="appVersionTag" class="version-tag">V0.0003</span>
+      <span id="appVersionTag" class="version-tag">V0.0004</span>
     </div>
   </header>
 
@@ -31,7 +31,7 @@
         <button id="btnNewArticle" class="btn btn-primary btn-block">✏️ (1) 開啟新解讀</button>
       </div>
 
-      <!-- 步驟 2: 抓取填入 (支援自由、聯合、中時、三立外部超連結) -->
+      <!-- 步驟 2: 抓取填入 -->
       <div class="step-box">
         <label for="autoNewsUrl" class="step-label">
           🔗 (2) 貼入新聞網址自動抓取 (
@@ -157,12 +157,25 @@
     </section>
   </main>
 
-  <!-- 歷史文章庫抽屜 -->
+  <!-- 歷史文章庫抽屜 (升級：加入搜尋與媒體過濾列) -->
   <aside id="historyDrawer" class="history-drawer">
     <div class="drawer-header">
-      <h3>📚 歷史解讀文章庫</h3>
+      <h3>📚 歷史解讀文章庫 <span id="historyCountTag" class="count-badge">0</span></h3>
       <button id="btnCloseDrawer" class="btn-close">&times;</button>
     </div>
+
+    <!-- 搜尋與過濾控制區 -->
+    <div class="drawer-filter-box">
+      <input type="text" id="historySearchInput" placeholder="🔍 搜尋標題或媒體關鍵字...">
+      <div class="media-filter-tags" id="mediaFilterTags">
+        <button class="filter-chip active" data-media="ALL">全部</button>
+        <button class="filter-chip" data-media="自由時報">自由</button>
+        <button class="filter-chip" data-media="聯合報">聯合</button>
+        <button class="filter-chip" data-media="中國時報">中時</button>
+        <button class="filter-chip" data-media="三立新聞">三立</button>
+      </div>
+    </div>
+
     <div class="drawer-body">
       <ul id="historyList" class="history-list">
         <li class="loading-text">載入中...</li>
@@ -171,9 +184,9 @@
   </aside>
   <div id="drawerOverlay" class="drawer-overlay"></div>
 
-  <!-- 快取更新：帶入 V0.0003 -->
-  <script src="config.js?v=V0.0003"></script>
-  <script src="js/supabase-client.js?v=V0.0003"></script>
-  <script src="js/app.js?v=V0.0003"></script>
+  <!-- 快取更新：帶入 V0.0004 -->
+  <script src="config.js?v=V0.0004"></script>
+  <script src="js/supabase-client.js?v=V0.0004"></script>
+  <script src="js/app.js?v=V0.0004"></script>
 </body>
 </html>
