@@ -5,7 +5,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statusEl = document.getElementById("userStatusText");
   const authBtn = document.getElementById("authBtn");
 
-  // 1. 更新登入狀態 UI
+  // 安全防護：確認 API 是否存在
+  if (!window.P135_API) {
+    statusEl.textContent = "API 初始化失敗，請檢查金鑰設定";
+    alert("API 初始化失敗，請檢查 config.js 與 supabase-client.js！");
+    return;
+  }
+
+  // 1. 認證 UI 更新邏輯
   function updateAuthUI(user) {
     if (user) {
       statusEl.textContent = `已認證：${user.email}`;
@@ -23,7 +30,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 處理登入/註冊動作
   async function handleAuthClick() {
     const email = prompt("請輸入您的登入 Email：");
     if (!email) return;
@@ -31,16 +37,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!password) return;
 
     try {
-      // 先嘗試登入
       const { data, error } = await window.P135_API.signIn(email, password);
       if (error) {
-        // 若帳號不存在或密碼不符，詢問是否要直接註冊
         if (confirm(`登入未成功（${error.message}）。是否以此帳號進行註冊？`)) {
           const signUpRes = await window.P135_API.signUp(email, password);
           if (signUpRes.error) {
             alert("註冊失敗：" + signUpRes.error.message);
           } else {
-            alert("註冊成功！若 Supabase 後台有開啟信箱驗證，請至信箱點擊確認信後登入。");
+            alert("註冊成功！若有啟用信箱驗證，請至信箱收取確認信。");
             location.reload();
           }
         }
@@ -53,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 初始化取得當前使用者
+  // 初始化取得登入狀態
   try {
     const user = await window.P135_API.getUser();
     updateAuthUI(user);
@@ -62,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAuthUI(null);
   }
 
-  // 監聽認證狀態變動
+  // 監聽登入狀態改變
   window.P135_API.onAuthStateChange((_event, session) => {
     updateAuthUI(session?.user || null);
   });
@@ -77,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // 3. 渲染解讀結果
+  // 3. 渲染解讀結果到中欄
   function renderAnalysisUI(analysis) {
     if (!analysis) return;
     currentAnalysis = analysis;
@@ -101,7 +105,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("opinionsList").innerHTML = opinions.length ? opinions.map(o => `<li>${o}</li>`).join("") : "<li>無顯著主觀觀點</li>";
   }
 
-  // 4. AI 多維解讀
+  // 4. 網址自動擷取 (中欄上方按鈕)
+  document.getElementById("btnFetchUrl").addEventListener("click", async () => {
+    const url = document.getElementById("autoNewsUrl").value.trim();
+    if (!url) {
+      alert("請先輸入新聞網址！");
+      return;
+    }
+
+    const btn = document.getElementById("btnFetchUrl");
+    btn.disabled = true;
+    btn.textContent = "擷取中...";
+
+    try {
+      const data = await window.P135_API.scrapeNewsUrl(url);
+
+      // 自動填入左欄
+      currentArticleId = null; // 視為新文章，避免覆蓋
+      document.getElementById("newsTitle").value = data.title || "";
+      document.getElementById("newsMedia").value = data.media || "";
+      document.getElementById("newsDate").value = data.date || "";
+      document.getElementById("newsUrl").value = url;
+      document.getElementById("newsContent").value = data.content || "";
+
+      alert(`成功擷取【${data.media}】報導！請檢查內容無誤後，即可點擊開始解讀。`);
+    } catch (err) {
+      alert("自動擷取失敗：" + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "抓取填入";
+    }
+  });
+
+  // 5. 開始 AI 多維解讀
   document.getElementById("btnStartAnalyze").addEventListener("click", async () => {
     const title = document.getElementById("newsTitle").value;
     const content = document.getElementById("newsContent").value;
@@ -127,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 5. 存入事蹟懶人包
+  // 6. 存入事蹟懶人包
   document.getElementById("btnAddEvent").addEventListener("click", async () => {
     const name = document.getElementById("entityName").value;
     const title = document.getElementById("eventTitle").value;
@@ -156,7 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 6. 儲存整篇新聞與解讀
+  // 7. 儲存整篇新聞與解讀
   document.getElementById("btnSaveAll").addEventListener("click", async () => {
     const title = document.getElementById("newsTitle").value;
     const originalContent = document.getElementById("newsContent").value;
@@ -167,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
+      const isNew = !currentArticleId;
       const id = await window.P135_API.upsertArticle({
         id: currentArticleId,
         title,
@@ -181,13 +218,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         personalNotes: document.getElementById("personalNotes").value
       });
       currentArticleId = id;
-      alert("完整解讀已存入資料庫！");
+      alert(isNew ? "已成功新增並儲存解讀文章！" : "文章已更新完成！");
     } catch (err) {
       alert("存檔失敗：" + err.message);
     }
   });
 
-  // 7. 歷史文章庫抽屜
+  // 8. 歷史文章庫抽屜控制
   const drawer = document.getElementById("historyDrawer");
   const overlay = document.getElementById("drawerOverlay");
 
@@ -206,6 +243,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnCloseDrawer").addEventListener("click", () => toggleDrawer(false));
   overlay.addEventListener("click", () => toggleDrawer(false));
 
+  // 開啟新解讀（清空工作台）
   document.getElementById("btnNewArticle").addEventListener("click", () => {
     if (confirm("是否清空目前內容，開啟一篇全新新聞解讀？")) {
       currentArticleId = null;
@@ -214,6 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("newsMedia").value = "";
       document.getElementById("newsDate").value = "";
       document.getElementById("newsUrl").value = "";
+      document.getElementById("autoNewsUrl").value = "";
       document.getElementById("newsContent").value = "";
       document.getElementById("personalNotes").value = "";
       document.getElementById("neutralContentBox").innerHTML = '<p class="placeholder-text">點擊「開始解讀」後產生客觀中性版本...</p>';
@@ -224,6 +263,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // 載入歷史文章清單
   async function loadHistoryList() {
     const listEl = document.getElementById("historyList");
     listEl.innerHTML = '<li class="loading-text">載入歷史紀錄中...</li>';
@@ -257,6 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // 載入單篇完整內容回填
   async function loadArticleDetail(articleId) {
     try {
       const art = await window.P135_API.getArticleDetail(articleId);
@@ -266,6 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("newsMedia").value = art.source_media || "";
       document.getElementById("newsDate").value = art.published_date || "";
       document.getElementById("newsUrl").value = art.source_url || "";
+      document.getElementById("autoNewsUrl").value = art.source_url || "";
       document.getElementById("newsContent").value = art.original_content || "";
       document.getElementById("personalNotes").value = art.personal_notes || "";
 
@@ -280,34 +322,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (err) {
       alert("載入文章失敗：" + err.message);
     }
-  }
-});
-document.getElementById("btnFetchUrl").addEventListener("click", async () => {
-  const url = document.getElementById("autoNewsUrl").value.trim();
-  if (!url) {
-    alert("請先輸入新聞網址！");
-    return;
-  }
-
-  const btn = document.getElementById("btnFetchUrl");
-  btn.disabled = true;
-  btn.textContent = "擷取中...";
-
-  try {
-    const data = await window.P135_API.scrapeNewsUrl(url);
-
-    // 自動填入工作台左欄
-    document.getElementById("newsTitle").value = data.title || "";
-    document.getElementById("newsMedia").value = data.media || "";
-    document.getElementById("newsDate").value = data.date || "";
-    document.getElementById("newsUrl").value = url;
-    document.getElementById("newsContent").value = data.content || "";
-
-    alert(`成功擷取【${data.media}】報導！請檢查內容無誤後，即可點擊開始解讀。`);
-  } catch (err) {
-    alert("自動擷取失敗：" + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "抓取新聞";
   }
 });
