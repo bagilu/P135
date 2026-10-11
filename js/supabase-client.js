@@ -117,3 +117,23 @@
     }
   };
 })();
+
+async scrapeNewsUrl(url) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || "";
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/P135-scrape-news`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ url })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || "擷取網頁失敗");
+  }
+  return await response.json();
+}
