@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P135 翻轉新聞 FlipNews</title>
-  <link rel="stylesheet" href="css/style.css?v=v3.3.2">
+  <link rel="stylesheet" href="css/style.css?v=V0.0002">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
@@ -16,26 +16,39 @@
     </div>
     <div class="user-status">
       <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
-      <button id="btnNewArticle" class="btn btn-primary btn-sm">✏️ 開啟新解讀</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入 / 註冊</button>
-      <span class="version-tag">v3.3.2</span>
+      <span id="appVersionTag" class="version-tag">V0.0002</span>
     </div>
   </header>
 
   <!-- 三欄工作台 -->
   <main class="workspace-container">
-    <!-- 【左欄：原文與來源】 -->
+    <!-- 【左欄：循序操作 1 -> 2 -> 3】 -->
     <section class="panel panel-left">
-      <h2>1. 新聞原文與來源</h2>
+      <!-- 步驟 1: 開啟新解讀 -->
+      <div class="step-box step-box-top">
+        <button id="btnNewArticle" class="btn btn-primary btn-block">✏️ (1) 開啟新解讀</button>
+      </div>
+
+      <!-- 步驟 2: 抓取填入 -->
+      <div class="step-box">
+        <label for="autoNewsUrl" class="step-label">🔗 (2) 貼入新聞網址自動抓取 (自由 / 聯合 / 中時)</label>
+        <div class="input-with-button">
+          <input type="url" id="autoNewsUrl" placeholder="https://news.ltn.com.tw/... 或 https://udn.com/...">
+          <button id="btnFetchUrl" class="btn btn-secondary btn-sm">抓取填入</button>
+        </div>
+      </div>
+
+      <!-- 新聞資料與全文輸入區 -->
       <div class="form-group">
         <label for="newsTitle">新聞標題</label>
-        <input type="text" id="newsTitle" placeholder="貼入新聞標題...">
+        <input type="text" id="newsTitle" placeholder="貼入或抓取之新聞標題...">
       </div>
       <div class="form-row">
         <div class="form-group flex-1">
           <label for="newsMedia">來源媒體</label>
-          <input type="text" id="newsMedia" placeholder="例如：某報、某社">
+          <input type="text" id="newsMedia" placeholder="例如：聯合報、自由時報">
         </div>
         <div class="form-group flex-1">
           <label for="newsDate">報導日期</label>
@@ -48,22 +61,18 @@
       </div>
       <div class="form-group flex-grow">
         <label for="newsContent">新聞內文全文</label>
-        <textarea id="newsContent" placeholder="在此貼入新聞長文..."></textarea>
+        <textarea id="newsContent" placeholder="在此檢閱或貼入新聞長文..."></textarea>
       </div>
+
+      <!-- 步驟 3: 進行 AI 多維解讀 -->
       <div class="actions">
-        <button id="btnStartAnalyze" class="btn btn-primary">⚡ 開始 AI 多維解讀</button>
+        <button id="btnStartAnalyze" class="btn btn-primary btn-block">⚡ (3) 進行 AI 多維解讀</button>
       </div>
     </section>
 
-    <!-- 【中欄：網址解析 + 多維度對照】 -->
+    <!-- 【中欄：多維度對照面板】 -->
     <section class="panel panel-center">
-      <!-- 移至中欄頂部的 URL 自動擷取工具條 -->
-      <div class="url-scrape-bar">
-        <input type="url" id="autoNewsUrl" placeholder="🔗 貼入新聞網址 (自由 / 聯合 / 中時)...">
-        <button id="btnFetchUrl" class="btn btn-secondary btn-sm">抓取填入</button>
-      </div>
-
-      <h2>2. 多維度對照面板</h2>
+      <h2>多維度對照面板</h2>
       <div class="tab-header">
         <button class="tab-btn active" data-tab="tabNeutral">中性客觀改寫</button>
         <button class="tab-btn" data-tab="tabFlip">顏色/立場對調</button>
@@ -73,7 +82,7 @@
 
       <div class="tab-content active" id="tabNeutral">
         <div class="diff-box" id="neutralContentBox">
-          <p class="placeholder-text">點擊「開始解讀」後產生客觀中性版本...</p>
+          <p class="placeholder-text">完成步驟 (3) 解讀後，此處產生客觀中性版本...</p>
         </div>
       </div>
 
@@ -105,7 +114,7 @@
 
     <!-- 【右欄：個人研判與事蹟存檔】 -->
     <section class="panel panel-right">
-      <h2>3. 我的研判與事蹟存檔</h2>
+      <h2>個人研判與事蹟存檔</h2>
       <div class="form-group">
         <label for="personalNotes">我的研判 / 動機推演 / 陰謀論</label>
         <textarea id="personalNotes" placeholder="誰在此時得利？為何這個時間點爆出？背後博弈邏輯..."></textarea>
@@ -134,13 +143,14 @@
         <button id="btnAddEvent" class="btn btn-secondary">＋ 存入個人懶人包庫</button>
       </div>
 
+      <!-- 步驟 4: 儲存本篇完整解讀 -->
       <div class="actions">
-        <button id="btnSaveAll" class="btn btn-success">💾 儲存本篇完整解讀</button>
+        <button id="btnSaveAll" class="btn btn-success btn-block">💾 (4) 儲存本篇完整解讀</button>
       </div>
     </section>
   </main>
 
-  <!-- 歷史清單抽屜 -->
+  <!-- 歷史文章庫抽屜 -->
   <aside id="historyDrawer" class="history-drawer">
     <div class="drawer-header">
       <h3>📚 歷史解讀文章庫</h3>
@@ -154,9 +164,8 @@
   </aside>
   <div id="drawerOverlay" class="drawer-overlay"></div>
 
-  <!-- 載入腳本 (Cache Busting) -->
-  <script src="config.js?v=v3.3.2"></script>
-  <script src="js/supabase-client.js?v=v3.3.2"></script>
-  <script src="js/app.js?v=v3.3.2"></script>
+  <script src="config.js?v=V0.0002"></script>
+  <script src="js/supabase-client.js?v=V0.0002"></script>
+  <script src="js/app.js?v=V0.0002"></script>
 </body>
 </html>
