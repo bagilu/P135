@@ -4,22 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P135 翻轉新聞 FlipNews</title>
-  <link rel="stylesheet" href="css/style.css?v=v3.3.0">
+  <link rel="stylesheet" href="css/style.css?v=v3.3.1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
+  <!-- 頂部導航列 -->
   <header class="app-header">
     <div class="brand">
       <span class="badge">P135</span>
       <h1>翻轉新聞 FlipNews</h1>
     </div>
     <div class="user-status">
+      <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
+      <button id="btnNewArticle" class="btn btn-primary btn-sm">✏️ 開啟新解讀</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入 / 註冊</button>
-      <span class="version-tag">v3.3.0</span>
+      <span class="version-tag">v3.3.1</span>
     </div>
   </header>
 
+  <!-- 三欄工作台 -->
   <main class="workspace-container">
     <!-- 左欄：輸入區 -->
     <section class="panel panel-left">
@@ -130,8 +134,22 @@
     </section>
   </main>
 
-  <script src="config.js?v=v3.3.0"></script>
-  <script src="js/supabase-client.js?v=v3.3.0"></script>
-  <script src="js/app.js?v=v3.3.0"></script>
+  <!-- 歷史清單側邊欄抽屜 (Drawer) -->
+  <aside id="historyDrawer" class="history-drawer">
+    <div class="drawer-header">
+      <h3>📚 歷史解讀文章庫</h3>
+      <button id="btnCloseDrawer" class="btn-close">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <ul id="historyList" class="history-list">
+        <li class="loading-text">載入中...</li>
+      </ul>
+    </div>
+  </aside>
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+
+  <script src="config.js?v=v3.3.1"></script>
+  <script src="js/supabase-client.js?v=v3.3.1"></script>
+  <script src="js/app.js?v=v3.3.1"></script>
 </body>
 </html>
