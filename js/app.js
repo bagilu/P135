@@ -2,30 +2,70 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentAnalysis = null;
   let currentArticleId = null;
 
-  // 1. 檢查使用者登入狀態
-  const user = await window.P135_API.getUser();
   const statusEl = document.getElementById("userStatusText");
   const authBtn = document.getElementById("authBtn");
 
-  if (user) {
-    statusEl.textContent = `已認證：${user.email}`;
-    authBtn.textContent = "已登入";
-  } else {
-    statusEl.textContent = "未登入";
-    authBtn.onclick = async () => {
-      const email = prompt("請輸入 Email：");
-      const password = prompt("請輸入密碼：");
-      if (email && password) {
-        const { error } = await window.P135_API.signIn(email, password);
-        if (error) {
-          await window.P135_API.signUp(email, password);
-          alert("已發送驗證信或完成註冊，請重新登入！");
-        } else {
+  // 1. 更新登入狀態 UI
+  function updateAuthUI(user) {
+    if (user) {
+      statusEl.textContent = `已認證：${user.email}`;
+      authBtn.textContent = "登出";
+      authBtn.onclick = async () => {
+        if (confirm("確定要登出嗎？")) {
+          await window.P135_API.signOut();
           location.reload();
         }
-      }
-    };
+      };
+    } else {
+      statusEl.textContent = "未登入";
+      authBtn.textContent = "登入 / 註冊";
+      authBtn.onclick = handleAuthClick;
+    }
   }
+
+  // 處理登入/註冊動作
+  async function handleAuthClick() {
+    const email = prompt("請輸入您的登入 Email：");
+    if (!email) return;
+    const password = prompt("請輸入密碼：");
+    if (!password) return;
+
+    try {
+      // 先嘗試登入
+      const { data, error } = await window.P135_API.signIn(email, password);
+      if (error) {
+        // 若帳號不存在或密碼不符，詢問是否要直接註冊
+        if (confirm(`登入未成功（${error.message}）。是否以此帳號進行註冊？`)) {
+          const signUpRes = await window.P135_API.signUp(email, password);
+          if (signUpRes.error) {
+            alert("註冊失敗：" + signUpRes.error.message);
+          } else {
+            alert("註冊成功！若 Supabase 後台有開啟信箱驗證，請至信箱點擊確認信後登入。");
+            location.reload();
+          }
+        }
+      } else {
+        alert("登入成功！");
+        updateAuthUI(data.user);
+      }
+    } catch (err) {
+      alert("操作發生異常：" + err.message);
+    }
+  }
+
+  // 初始化取得當前使用者
+  try {
+    const user = await window.P135_API.getUser();
+    updateAuthUI(user);
+  } catch (e) {
+    console.error("無法取得使用者狀態", e);
+    updateAuthUI(null);
+  }
+
+  // 監聽認證狀態變動
+  window.P135_API.onAuthStateChange((_event, session) => {
+    updateAuthUI(session?.user || null);
+  });
 
   // 2. 標籤頁切換
   document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -37,35 +77,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // 3. 渲染解讀結果到畫面上 (抽成共用函式)
+  // 3. 渲染解讀結果
   function renderAnalysisUI(analysis) {
     if (!analysis) return;
     currentAnalysis = analysis;
 
-    // 中性版
     document.getElementById("neutralContentBox").innerHTML = 
       `<p>${analysis.neutral_rewriting || "無資料"}</p>`;
     
-    // 立場對調版
     document.getElementById("flippedContentBox").innerHTML = 
       `<h4>改寫結果：</h4><p>${analysis.flipped_perspective?.summary || "無資料"}</p>
        <h4>心理感受分析：</h4><p>${analysis.flipped_perspective?.reading_feeling || "無"}</p>`;
 
-    // 情緒詞句
     const words = analysis.sentiment_analysis?.loaded_words || [];
     const wordsHtml = words.map(w => `<li><strong>${w.word_or_phrase}</strong> [${w.category}]: ${w.explanation}</li>`).join("");
     document.getElementById("sentimentAnalysisBox").innerHTML = 
       `<h4>基調：${analysis.sentiment_analysis?.overall_tone || "未標註"} (煽動指數: ${analysis.sentiment_analysis?.bias_rating || "-"}/5)</h4>
        <ul>${wordsHtml || "<li>無特殊情緒字眼</li>"}</ul>`;
 
-    // 事實與觀點清單
     const facts = analysis.fact_vs_opinion?.facts || [];
     const opinions = analysis.fact_vs_opinion?.opinions || [];
     document.getElementById("factsList").innerHTML = facts.length ? facts.map(f => `<li>${f}</li>`).join("") : "<li>無明確事實紀錄</li>";
     document.getElementById("opinionsList").innerHTML = opinions.length ? opinions.map(o => `<li>${o}</li>`).join("") : "<li>無顯著主觀觀點</li>";
   }
 
-  // 4. AI 多維解讀按鈕
+  // 4. AI 多維解讀
   document.getElementById("btnStartAnalyze").addEventListener("click", async () => {
     const title = document.getElementById("newsTitle").value;
     const content = document.getElementById("newsContent").value;
@@ -151,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 7. 歷史文章庫抽屜控制與點選載入
+  // 7. 歷史文章庫抽屜
   const drawer = document.getElementById("historyDrawer");
   const overlay = document.getElementById("drawerOverlay");
 
@@ -170,7 +206,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnCloseDrawer").addEventListener("click", () => toggleDrawer(false));
   overlay.addEventListener("click", () => toggleDrawer(false));
 
-  // 開新文章按鈕
   document.getElementById("btnNewArticle").addEventListener("click", () => {
     if (confirm("是否清空目前內容，開啟一篇全新新聞解讀？")) {
       currentArticleId = null;
@@ -189,7 +224,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 載入歷史文章清單
   async function loadHistoryList() {
     const listEl = document.getElementById("historyList");
     listEl.innerHTML = '<li class="loading-text">載入歷史紀錄中...</li>';
@@ -211,7 +245,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         </li>
       `).join("");
 
-      // 綁定點選載入事件
       document.querySelectorAll(".history-item").forEach(item => {
         item.addEventListener("click", async () => {
           const id = item.dataset.id;
@@ -224,23 +257,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 點選後載入單篇完整內容回填到工作台
   async function loadArticleDetail(articleId) {
     try {
       const art = await window.P135_API.getArticleDetail(articleId);
       currentArticleId = art.id;
 
-      // 回填左欄原文
       document.getElementById("newsTitle").value = art.title || "";
       document.getElementById("newsMedia").value = art.source_media || "";
       document.getElementById("newsDate").value = art.published_date || "";
       document.getElementById("newsUrl").value = art.source_url || "";
       document.getElementById("newsContent").value = art.original_content || "";
-
-      // 回填右欄筆記
       document.getElementById("personalNotes").value = art.personal_notes || "";
 
-      // 回填中欄分析結果
       renderAnalysisUI({
         neutral_rewriting: art.neutral_content,
         flipped_perspective: { summary: art.flipped_content, reading_feeling: "" },
