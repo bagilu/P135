@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   let currentAnalysis = null;
   let currentArticleId = null;
+  let cachedArticles = []; // 用於歷史抽屜前端過濾的文章列表快取
+  let selectedMediaFilter = "ALL";
 
   // 1. 同步顯示最新版本號於首頁右上角
   const versionEl = document.getElementById("appVersionTag");
@@ -248,14 +250,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 10. 歷史文章庫抽屜控制與點選回填
+  // 10. 歷史文章庫抽屜控制、過濾與搜尋邏輯
   const drawer = document.getElementById("historyDrawer");
   const overlay = document.getElementById("drawerOverlay");
+  const searchInput = document.getElementById("historySearchInput");
+  const countTag = document.getElementById("historyCountTag");
 
   function toggleDrawer(open) {
     if (open) {
       drawer.classList.add("open");
       overlay.classList.add("open");
+      if (searchInput) searchInput.value = "";
+      selectedMediaFilter = "ALL";
+      updateMediaChipsUI();
       loadHistoryList();
     } else {
       drawer.classList.remove("open");
@@ -267,39 +274,92 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnCloseDrawer").addEventListener("click", () => toggleDrawer(false));
   overlay.addEventListener("click", () => toggleDrawer(false));
 
+  // 媒體 Filter Chips 點選切換
+  document.querySelectorAll(".filter-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      selectedMediaFilter = chip.dataset.media;
+      updateMediaChipsUI();
+      renderFilteredHistory();
+    });
+  });
+
+  function updateMediaChipsUI() {
+    document.querySelectorAll(".filter-chip").forEach(chip => {
+      if (chip.dataset.media === selectedMediaFilter) {
+        chip.classList.add("active");
+      } else {
+        chip.classList.remove("active");
+      }
+    });
+  }
+
+  // 關鍵字搜尋即時觸發
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      renderFilteredHistory();
+    });
+  }
+
+  // 從 Supabase 取得文章並存入前端快取
   async function loadHistoryList() {
     const listEl = document.getElementById("historyList");
     listEl.innerHTML = '<li class="loading-text">載入歷史紀錄中...</li>';
 
     try {
-      const articles = await window.P135_API.getArticles(50, 0);
-      if (!articles || articles.length === 0) {
-        listEl.innerHTML = '<li class="placeholder-text" style="padding:12px;">尚無任何存檔文章</li>';
-        return;
-      }
-
-      listEl.innerHTML = articles.map(art => `
-        <li class="history-item" data-id="${art.id}">
-          <div class="history-item-title">${art.title || "無標題文章"}</div>
-          <div class="history-item-meta">
-            <span>${art.source_media || "未知媒體"}</span>
-            <span>${art.published_date || new Date(art.created_at).toLocaleDateString()}</span>
-          </div>
-        </li>
-      `).join("");
-
-      document.querySelectorAll(".history-item").forEach(item => {
-        item.addEventListener("click", async () => {
-          const id = item.dataset.id;
-          await loadArticleDetail(id);
-          toggleDrawer(false);
-        });
-      });
+      // 一次最多載入 100 筆
+      const articles = await window.P135_API.getArticles(100, 0);
+      cachedArticles = articles || [];
+      renderFilteredHistory();
     } catch (err) {
       listEl.innerHTML = `<li style="color:#ef4444; padding:12px;">載入失敗: ${err.message}</li>`;
+      if (countTag) countTag.textContent = "0";
     }
   }
 
+  // 依搜尋字詞與媒體標籤進行前端即時篩選與渲染
+  function renderFilteredHistory() {
+    const listEl = document.getElementById("historyList");
+    const keyword = (searchInput ? searchInput.value : "").trim().toLowerCase();
+
+    const filtered = cachedArticles.filter(art => {
+      const matchMedia = (selectedMediaFilter === "ALL") || 
+        (art.source_media && art.source_media.includes(selectedMediaFilter));
+      
+      const titleMatch = (art.title || "").toLowerCase().includes(keyword);
+      const mediaMatch = (art.source_media || "").toLowerCase().includes(keyword);
+      const matchKeyword = !keyword || titleMatch || mediaMatch;
+
+      return matchMedia && matchKeyword;
+    });
+
+    if (countTag) countTag.textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<li class="placeholder-text" style="padding:16px; text-align:center;">無符合條件的歷史文章</li>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(art => `
+      <li class="history-item" data-id="${art.id}">
+        <div class="history-item-title">${art.title || "無標題文章"}</div>
+        <div class="history-item-meta">
+          <span class="media-tag-small">${art.source_media || "未知媒體"}</span>
+          <span>${art.published_date || new Date(art.created_at).toLocaleDateString()}</span>
+        </div>
+      </li>
+    `).join("");
+
+    // 綁定點選載入事件
+    listEl.querySelectorAll(".history-item").forEach(item => {
+      item.addEventListener("click", async () => {
+        const id = item.dataset.id;
+        await loadArticleDetail(id);
+        toggleDrawer(false);
+      });
+    });
+  }
+
+  // 載入單篇完整內容回填
   async function loadArticleDetail(articleId) {
     try {
       const art = await window.P135_API.getArticleDetail(articleId);
