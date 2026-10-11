@@ -2,17 +2,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentAnalysis = null;
   let currentArticleId = null;
 
+  // 1. 同步顯示最新版本號於首頁右上角
+  const versionEl = document.getElementById("appVersionTag");
+  if (versionEl && window.APP_CONFIG?.APP_VERSION) {
+    versionEl.textContent = window.APP_CONFIG.APP_VERSION;
+  }
+
   const statusEl = document.getElementById("userStatusText");
   const authBtn = document.getElementById("authBtn");
 
-  // 安全防護：確認 API 是否存在
   if (!window.P135_API) {
-    statusEl.textContent = "API 初始化失敗，請檢查金鑰設定";
+    statusEl.textContent = "API 初始化失敗";
     alert("API 初始化失敗，請檢查 config.js 與 supabase-client.js！");
     return;
   }
 
-  // 1. 認證 UI 更新邏輯
+  // 2. 認證 UI 更新邏輯
   function updateAuthUI(user) {
     if (user) {
       statusEl.textContent = `已認證：${user.email}`;
@@ -57,7 +62,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 初始化取得登入狀態
   try {
     const user = await window.P135_API.getUser();
     updateAuthUI(user);
@@ -66,12 +70,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAuthUI(null);
   }
 
-  // 監聽登入狀態改變
   window.P135_API.onAuthStateChange((_event, session) => {
     updateAuthUI(session?.user || null);
   });
 
-  // 2. 標籤頁切換
+  // 3. 標籤頁切換
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -81,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // 3. 渲染解讀結果到中欄
+  // 4. 渲染解讀結果到中欄
   function renderAnalysisUI(analysis) {
     if (!analysis) return;
     currentAnalysis = analysis;
@@ -105,7 +108,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("opinionsList").innerHTML = opinions.length ? opinions.map(o => `<li>${o}</li>`).join("") : "<li>無顯著主觀觀點</li>";
   }
 
-  // 4. 網址自動擷取 (中欄上方按鈕)
+  // 5. 步驟 (1)：開啟新解讀
+  document.getElementById("btnNewArticle").addEventListener("click", () => {
+    if (confirm("是否清空目前內容，開啟一篇全新新聞解讀？")) {
+      currentArticleId = null;
+      currentAnalysis = null;
+      document.getElementById("newsTitle").value = "";
+      document.getElementById("newsMedia").value = "";
+      document.getElementById("newsDate").value = "";
+      document.getElementById("newsUrl").value = "";
+      document.getElementById("autoNewsUrl").value = "";
+      document.getElementById("newsContent").value = "";
+      document.getElementById("personalNotes").value = "";
+      document.getElementById("neutralContentBox").innerHTML = '<p class="placeholder-text">完成步驟 (3) 解讀後，此處產生客觀中性版本...</p>';
+      document.getElementById("flippedContentBox").innerHTML = '<p class="placeholder-text">立場對調版本將在此呈現...</p>';
+      document.getElementById("sentimentAnalysisBox").innerHTML = '<p class="placeholder-text">煽動指數與情緒修飾字眼分析...</p>';
+      document.getElementById("factsList").innerHTML = '';
+      document.getElementById("opinionsList").innerHTML = '';
+    }
+  });
+
+  // 6. 步驟 (2)：貼入網址自動抓取填入
   document.getElementById("btnFetchUrl").addEventListener("click", async () => {
     const url = document.getElementById("autoNewsUrl").value.trim();
     if (!url) {
@@ -115,20 +138,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const btn = document.getElementById("btnFetchUrl");
     btn.disabled = true;
-    btn.textContent = "擷取中...";
+    btn.textContent = "抓取中...";
 
     try {
       const data = await window.P135_API.scrapeNewsUrl(url);
 
-      // 自動填入左欄
-      currentArticleId = null; // 視為新文章，避免覆蓋
+      currentArticleId = null; // 抓取新網址時視為全新文章
       document.getElementById("newsTitle").value = data.title || "";
       document.getElementById("newsMedia").value = data.media || "";
       document.getElementById("newsDate").value = data.date || "";
       document.getElementById("newsUrl").value = url;
       document.getElementById("newsContent").value = data.content || "";
 
-      alert(`成功擷取【${data.media}】報導！請檢查內容無誤後，即可點擊開始解讀。`);
+      alert(`成功擷取【${data.media}】報導！請檢查內容無誤後，即可點擊步驟 (3) 開始解讀。`);
     } catch (err) {
       alert("自動擷取失敗：" + err.message);
     } finally {
@@ -137,13 +159,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 5. 開始 AI 多維解讀
+  // 7. 步驟 (3)：進行 AI 多維解讀
   document.getElementById("btnStartAnalyze").addEventListener("click", async () => {
+    currentArticleId = null; // 分析新內容強制視為新存檔，避免覆蓋舊文
+
     const title = document.getElementById("newsTitle").value;
     const content = document.getElementById("newsContent").value;
 
     if (!content) {
-      alert("請先貼入新聞內文！");
+      alert("請先貼入新聞內文或透過步驟 (2) 自動抓取！");
       return;
     }
 
@@ -159,11 +183,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("解讀失敗：" + err.message);
     } finally {
       analyzeBtn.disabled = false;
-      analyzeBtn.textContent = "⚡ 開始 AI 多維解讀";
+      analyzeBtn.textContent = "⚡ (3) 進行 AI 多維解讀";
     }
   });
 
-  // 6. 存入事蹟懶人包
+  // 8. 存入事蹟懶人包
   document.getElementById("btnAddEvent").addEventListener("click", async () => {
     const name = document.getElementById("entityName").value;
     const title = document.getElementById("eventTitle").value;
@@ -192,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 7. 儲存整篇新聞與解讀
+  // 9. 步驟 (4)：儲存本篇完整解讀
   document.getElementById("btnSaveAll").addEventListener("click", async () => {
     const title = document.getElementById("newsTitle").value;
     const originalContent = document.getElementById("newsContent").value;
@@ -224,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 8. 歷史文章庫抽屜控制
+  // 10. 歷史文章庫抽屜控制與點選回填
   const drawer = document.getElementById("historyDrawer");
   const overlay = document.getElementById("drawerOverlay");
 
@@ -243,27 +267,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnCloseDrawer").addEventListener("click", () => toggleDrawer(false));
   overlay.addEventListener("click", () => toggleDrawer(false));
 
-  // 開啟新解讀（清空工作台）
-  document.getElementById("btnNewArticle").addEventListener("click", () => {
-    if (confirm("是否清空目前內容，開啟一篇全新新聞解讀？")) {
-      currentArticleId = null;
-      currentAnalysis = null;
-      document.getElementById("newsTitle").value = "";
-      document.getElementById("newsMedia").value = "";
-      document.getElementById("newsDate").value = "";
-      document.getElementById("newsUrl").value = "";
-      document.getElementById("autoNewsUrl").value = "";
-      document.getElementById("newsContent").value = "";
-      document.getElementById("personalNotes").value = "";
-      document.getElementById("neutralContentBox").innerHTML = '<p class="placeholder-text">點擊「開始解讀」後產生客觀中性版本...</p>';
-      document.getElementById("flippedContentBox").innerHTML = '<p class="placeholder-text">立場對調版本將在此呈現...</p>';
-      document.getElementById("sentimentAnalysisBox").innerHTML = '<p class="placeholder-text">煽動指數與情緒修飾字眼分析...</p>';
-      document.getElementById("factsList").innerHTML = '';
-      document.getElementById("opinionsList").innerHTML = '';
-    }
-  });
-
-  // 載入歷史文章清單
   async function loadHistoryList() {
     const listEl = document.getElementById("historyList");
     listEl.innerHTML = '<li class="loading-text">載入歷史紀錄中...</li>';
@@ -297,7 +300,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 載入單篇完整內容回填
   async function loadArticleDetail(articleId) {
     try {
       const art = await window.P135_API.getArticleDetail(articleId);
