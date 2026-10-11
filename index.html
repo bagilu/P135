@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P135 翻轉新聞 FlipNews</title>
-  <link rel="stylesheet" href="css/style.css?v=V0.0002">
+  <link rel="stylesheet" href="css/style.css?v=V0.0003">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
@@ -18,7 +18,7 @@
       <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入 / 註冊</button>
-      <span id="appVersionTag" class="version-tag">V0.0002</span>
+      <span id="appVersionTag" class="version-tag">V0.0003</span>
     </div>
   </header>
 
@@ -31,9 +31,16 @@
         <button id="btnNewArticle" class="btn btn-primary btn-block">✏️ (1) 開啟新解讀</button>
       </div>
 
-      <!-- 步驟 2: 抓取填入 -->
+      <!-- 步驟 2: 抓取填入 (支援自由、聯合、中時、三立外部超連結) -->
       <div class="step-box">
-        <label for="autoNewsUrl" class="step-label">🔗 (2) 貼入新聞網址自動抓取 (自由 / 聯合 / 中時)</label>
+        <label for="autoNewsUrl" class="step-label">
+          🔗 (2) 貼入新聞網址自動抓取 (
+          <a href="https://www.ltn.com.tw" target="_blank" rel="noopener noreferrer" class="media-link">自由</a> / 
+          <a href="https://udn.com/" target="_blank" rel="noopener noreferrer" class="media-link">聯合</a> / 
+          <a href="https://www.chinatimes.com" target="_blank" rel="noopener noreferrer" class="media-link">中時</a> / 
+          <a href="https://www.setn.com/catalog/politics" target="_blank" rel="noopener noreferrer" class="media-link">三立</a>
+          )
+        </label>
         <div class="input-with-button">
           <input type="url" id="autoNewsUrl" placeholder="https://news.ltn.com.tw/... 或 https://udn.com/...">
           <button id="btnFetchUrl" class="btn btn-secondary btn-sm">抓取填入</button>
@@ -48,7 +55,7 @@
       <div class="form-row">
         <div class="form-group flex-1">
           <label for="newsMedia">來源媒體</label>
-          <input type="text" id="newsMedia" placeholder="例如：聯合報、自由時報">
+          <input type="text" id="newsMedia" placeholder="例如：自由時報、聯合報、三立新聞">
         </div>
         <div class="form-group flex-1">
           <label for="newsDate">報導日期</label>
@@ -164,8 +171,9 @@
   </aside>
   <div id="drawerOverlay" class="drawer-overlay"></div>
 
-  <script src="config.js?v=V0.0002"></script>
-  <script src="js/supabase-client.js?v=V0.0002"></script>
-  <script src="js/app.js?v=V0.0002"></script>
+  <!-- 快取更新：帶入 V0.0003 -->
+  <script src="config.js?v=V0.0003"></script>
+  <script src="js/supabase-client.js?v=V0.0003"></script>
+  <script src="js/app.js?v=V0.0003"></script>
 </body>
 </html>
