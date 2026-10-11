@@ -1,11 +1,17 @@
 (function() {
   if (!window.APP_CONFIG) {
-    console.error("找不到 APP_CONFIG，請確認 config.js 是否載入！");
+    console.error("找不到 APP_CONFIG，請確認 config.js 是否已正確載入！");
     alert("找不到設定檔案 config.js，請檢查檔案是否存在！");
     return;
   }
 
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.APP_CONFIG;
+
+  if (!window.supabase) {
+    console.error("找不到 Supabase SDK，請確認 index.html 是否正確引入 CDN！");
+    return;
+  }
+
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
@@ -41,46 +47,58 @@
       return supabase.auth.onAuthStateChange(callback);
     },
 
-    // 網址擷取爬蟲
+    // 網址擷取爬蟲 Edge Function
     async scrapeNewsUrl(url) {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token || "";
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token || "";
 
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/P135-scrape-news`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ url })
-      });
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/P135-scrape-news`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ url: url.trim() })
+        });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || `擷取失敗 (HTTP ${response.status})`);
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          throw new Error(errBody.error || `擷取失敗 (HTTP ${response.status})`);
+        }
+
+        return await response.json();
+      } catch (err) {
+        console.error("scrapeNewsUrl 執行失敗:", err);
+        throw err;
       }
-      return await response.json();
     },
 
     // 呼叫 Edge Function 執行 AI 分析
     async analyzeNews(payload) {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token || "";
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token || "";
 
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/P135-analyze-news`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/P135-analyze-news`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || "AI 分析請求失敗");
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          throw new Error(errBody.error || `AI 分析請求失敗 (HTTP ${response.status})`);
+        }
+
+        return await response.json();
+      } catch (err) {
+        console.error("analyzeNews 執行失敗:", err);
+        throw err;
       }
-      return await response.json();
     },
 
     // RPC: 儲存或更新文章
