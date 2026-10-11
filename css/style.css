@@ -1,9 +1,276 @@
-/* 歷史文章庫側邊抽屜樣式 */
-.btn-sm {
-  padding: 4px 10px;
-  font-size: 0.85rem;
+:root {
+  --bg-dark: #121417;
+  --bg-panel: #1a1e24;
+  --bg-input: #0f1115;
+  --border-color: #2e3642;
+  --text-main: #e2e8f0;
+  --text-muted: #8c9ba8;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --success: #10b981;
+  --secondary: #374151;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+body.dark-theme {
+  margin: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 頂部導航列 */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background-color: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand h1 {
+  font-size: 1.15rem;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge {
+  background-color: var(--primary);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.version-tag {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  background-color: #242b35;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+/* 三欄核心工作台排版 */
+.workspace-container {
+  display: flex;
+  flex: 1;
+  gap: 1px;
+  background-color: var(--border-color);
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  background-color: var(--bg-panel);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.panel h2 {
+  font-size: 0.95rem;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 表單元件 */
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.flex-1 { flex: 1; }
+.flex-grow { flex: 1; display: flex; flex-direction: column; }
+
+input, textarea, select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+}
+
+textarea {
+  resize: none;
+  flex: 1;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* 按鈕樣式 */
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+.btn-primary { background-color: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
+.btn-success { background-color: var(--success); color: #fff; }
+.btn-secondary { background-color: var(--secondary); color: #fff; }
+
+.actions {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+/* 中欄頁籤與對照檢視 */
+.tab-header {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.tab-content {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.diff-box {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  border-radius: 4px;
+  min-height: 200px;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.placeholder-text {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.fact-opinion-grid {
+  display: flex;
+  gap: 12px;
+}
+
+.fact-col, .opinion-col {
+  flex: 1;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.fact-col h3, .opinion-col h3 {
+  font-size: 0.85rem;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.fact-col ul, .opinion-col ul, #sentimentAnalysisBox ul {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* 右欄事蹟小工具 */
+.dossier-tool {
+  background-color: #15181e;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.dossier-tool h3 {
+  font-size: 0.85rem;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+}
+
+/* 歷史文章庫側邊抽屜 (Drawer) */
 .history-drawer {
   position: fixed;
   top: 0;
@@ -12,7 +279,7 @@
   height: 100vh;
   background-color: var(--bg-panel);
   border-left: 1px solid var(--border-color);
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
   z-index: 1000;
   transition: right 0.3s ease;
   display: flex;
@@ -33,7 +300,7 @@
 
 .drawer-header h3 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--text-main);
 }
 
@@ -43,6 +310,11 @@
   font-size: 1.5rem;
   color: var(--text-muted);
   cursor: pointer;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  color: #fff;
 }
 
 .drawer-body {
@@ -61,7 +333,7 @@
 }
 
 .history-item {
-  background-color: #0f1115;
+  background-color: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 10px 12px;
@@ -75,9 +347,9 @@
 }
 
 .history-item-title {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--text-main);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -85,7 +357,7 @@
 }
 
 .history-item-meta {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   display: flex;
   justify-content: space-between;
@@ -97,7 +369,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
   z-index: 999;
   display: none;
 }
