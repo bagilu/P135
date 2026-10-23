@@ -2,7 +2,7 @@
   "environment": "Chromium 153 + actual PGlite PostgreSQL fresh install/RLS/RPC via in-process bridge; mocked Auth and AI upstream only; desktop 1440px and mobile 390px. Not the deployed Supabase gateway.",
   "checks": [
     {
-      "name": "real browser anonymous RPC list loads 40 tags from actual local PostgreSQL",
+      "name": "real browser anonymous RPC list loads 100 tags from actual local PostgreSQL",
       "status": "PASS"
     },
     {
@@ -10,7 +10,7 @@
       "status": "PASS"
     },
     {
-      "name": "load more and mobile layout do not overflow",
+      "name": "scroll automatically appends 100 then final 43, and mobile layout does not overflow",
       "status": "PASS"
     },
     {
@@ -50,5 +50,5 @@
       "status": "PASS"
     }
   ],
-  "rpc_calls": 20
+  "rpc_calls": 21
 }

@@ -4,22 +4,24 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="政治新聞的中性改寫、立場對調與用詞分析。閱讀已公開的翻轉新聞分析。">
   <title>翻轉新聞 FlipNews｜政治新聞分析庫</title>
-  <link rel="stylesheet" href="css/library.css?v=V0.04.2">
+  <link rel="stylesheet" href="css/library.css?v=V0.05">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="./"><span class="project">P135</span><span>翻轉新聞 <small>FlipNews</small></span></a><span class="version">V0.04.2</span></header>
+  <header class="site-header"><a class="brand" href="./"><span class="project">P135</span><span>翻轉新聞 <small>FlipNews</small></span></a><span class="version">V0.05</span></header>
   <main>
     <section id="libraryView" class="library-view" aria-labelledby="libraryTitle">
-      <div class="intro"><p class="eyebrow">A PERSONAL NEWS READING LIBRARY</p><h1 id="libraryTitle">換個角度，讀新聞。</h1><p>一份公開的政治新聞分析庫。從標題出發，閱讀不同角度的解讀。</p></div>
+      <div class="intro"><h1 id="libraryTitle">換個角度，讀新聞。</h1><p>一份公開的政治新聞分析庫。從標題出發，閱讀不同角度的解讀。</p></div>
       <form id="filterForm" class="toolbar" role="search">
         <label class="search-field"><span class="sr-only">搜尋標題或媒體</span><input id="searchInput" type="search" placeholder="搜尋標題或媒體…" maxlength="150"><button type="submit">搜尋</button></label>
         <label>日期排序<select id="sortOrder"><option value="desc">新到舊</option><option value="asc">舊到新</option></select></label>
       </form>
       <div class="list-heading"><span>已公開文章</span><span id="listCount" aria-live="polite"></span></div>
       <p id="libraryStatus" class="status" role="status">正在載入文章…</p>
-      <ul id="articleTags" class="article-tags" aria-label="文章清單"></ul>
-      <button id="btnLoadMore" class="load-more" type="button" hidden>載入更多</button>
+      <ul id="articleTags" class="article-tags" aria-label="文章清單" aria-busy="false"></ul>
+      <div id="loadSentinel" class="load-sentinel" aria-hidden="true"></div>
+      <p id="listProgress" class="list-progress" role="status" hidden></p>
+      <button id="btnLoadMore" class="load-more" type="button" hidden>載入更多（100 篇）</button>
       <button id="btnRetry" class="load-more" type="button" hidden>重新載入</button>
     </section>
     <article id="readerView" class="reader-view" hidden aria-labelledby="readerTitle">
@@ -37,5 +39,5 @@
     </article>
   </main>
   <footer class="site-footer"><p>慈濟大學 經營管理學系 <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener noreferrer">好玩實驗室</a> 作品</p><p>AI 分析提供閱讀參考；原始報導請見各文章來源連結。</p><a class="editor-entry" href="editor.html">編輯工作台</a></footer>
-  <script src="config.js?v=V0.04.2"></script><script src="js/supabase-client.js?v=V0.04.2"></script><script src="js/library.js?v=V0.04.2"></script>
+  <script src="config.js?v=V0.05"></script><script src="js/supabase-client.js?v=V0.05"></script><script src="js/library.js?v=V0.05"></script>
 </body></html>

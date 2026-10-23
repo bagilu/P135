@@ -1,0 +1,37 @@
+{
+  "environment": "LinkeDOM + Node VM + controlled IntersectionObserver and RPC promises; synthetic articles only.",
+  "checks": [
+    {
+      "name": "first request explicitly asks the existing RPC for 100 rows",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent sentinel callbacks do not duplicate the pending page",
+      "status": "PASS"
+    },
+    {
+      "name": "final partial page stops automatic fetching and displays completion",
+      "status": "PASS"
+    },
+    {
+      "name": "failed append preserves existing tags and stops automatic retries",
+      "status": "PASS"
+    },
+    {
+      "name": "manual retry resumes the failed offset without clearing loaded tags",
+      "status": "PASS"
+    },
+    {
+      "name": "search reset ignores an earlier pending response and resets offset",
+      "status": "PASS"
+    },
+    {
+      "name": "sentinel cannot fetch background pages while the reading view is open",
+      "status": "PASS"
+    },
+    {
+      "name": "an exact multiple performs one empty end check then stops",
+      "status": "PASS"
+    }
+  ]
+}

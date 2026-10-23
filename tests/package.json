@@ -1,8 +1,8 @@
 {
-  "name": "p135-v0042-tests",
+  "name": "p135-v005-tests",
   "private": true,
   "scripts": {
-    "test": "node database.cjs && node edge.cjs && node ui.cjs",
+    "test": "node database.cjs && node edge.cjs && node ui.cjs && node pagination.cjs",
     "test:browser": "node browser.cjs"
   },
   "devDependencies": {

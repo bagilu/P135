@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   'use strict';
   const $=id=>document.getElementById(id),api=window.P135_API;
   let canEdit=false,authEpoch=0,currentId=null,analysis=null,previouslyPublished=false,dirty=false,revision=0,documentToken=0,changeCounter=0,historyRows=[],historyOffset=0,historyMore=false,historyBusy=false,media='ALL';
-  $('appVersionTag').textContent='V0.04.2';
+  $('appVersionTag').textContent='V0.05';
   const text=(id,value)=>{$(id).textContent=typeof value==='string'?value:'';};
   const list=(id,rows,empty)=>{const el=$(id);el.replaceChildren();for(const row of Array.isArray(rows)&&rows.length?rows:[empty]){const li=document.createElement('li');li.textContent=typeof row==='string'?row:'';el.append(li);}};
   function assertEditor(){if(!canEdit)throw new Error('請使用已授權的編輯帳號登入。');}

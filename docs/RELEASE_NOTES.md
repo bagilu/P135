@@ -1,5 +1,7 @@
-# V0.04.2
+# V0.05
 
-已安裝 V0.04.1 的使用者，只需重新部署 P135-analyze-news 的單檔原碼，並把 Secrets 的 AI_MODELS 設為 gemini-3.8-flash,gemini-3.5-flash-lite；保留 AI_API_KEY 與 Verify JWT ON。
+只更新前端；保留 config.js，不執行任何 SQL、不重新部署 Edge Functions。
 
-**不執行 SQL、不重建資料庫、不清除文章。** 擷取函式不變。前端版本與快取號更新；Gemini 真實可用性需部署後測試。
+文章標籤使用日期色塊與標題共用的兩行排版、五種柔和彩色底及較短頁首。每批 100 篇，捲動到底部附近自動接續，提供手動載入與失敗接續重試。搜尋與排序涵蓋整個公開文章庫。
+
+本次 37 項本地檢查通過（DOM 17、分批載入 8、Chromium＋本地 PostgreSQL 12），正式 Supabase 資料不曾改動。全部 SQL、Edge 與 V0.04.2 相同；舊版 DB／Edge 報告是歷史證據，未計入本次測試總數。

@@ -2,7 +2,7 @@
   "environment": "LinkeDOM actual document parser + Node VM + mocked RPC/Auth. Not a rendered Chromium or live Supabase test; physical wrap/keyboard/focus still require real browser review.",
   "checks": [
     {
-      "name": "public home loads 40 tags without requesting sign-in",
+      "name": "public home loads 100 tags without requesting sign-in",
       "status": "PASS"
     },
     {
@@ -10,7 +10,7 @@
       "status": "PASS"
     },
     {
-      "name": "load more retrieves remaining articles",
+      "name": "load more retrieves subsequent batches of 100 then remaining articles",
       "status": "PASS"
     },
     {
