@@ -1,0 +1,5 @@
+[functions.P135-analyze-news]
+verify_jwt = true
+
+[functions.P135-scrape-news]
+verify_jwt = true

@@ -1,0 +1,15 @@
+{
+  "name": "p135-v003-tests",
+  "private": true,
+  "scripts": {
+    "test": "node database.cjs && node edge.cjs && node ui.cjs",
+    "test:browser": "node browser.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "typescript": "5.9.3",
+    "linkedom": "0.18.14",
+    "@fontsource/noto-sans-tc": "5.3.1",
+    "playwright": "1.62.1"
+  }
+}

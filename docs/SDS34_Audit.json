@@ -1,0 +1,89 @@
+{
+  "project": "P135",
+  "SDS_version": "3.4",
+  "web_version": "V0.03",
+  "source_baseline": "GitHub 5fc4448465c5c5cdfdf3a19b5a8d8657b53d8c92 + V0.02 local transition",
+  "checked_at": "2026-10-23T12:12:07+08:00",
+  "local_test_cases": 62,
+  "local_failures": 0,
+  "remote_changes_performed": false,
+  "release_status": "Release candidate — live environment REVIEW items require deployment verification",
+  "human_reviewer": null,
+  "checks": [
+    {
+      "id": "QA-01",
+      "status": "PASS",
+      "evidence": "本機 migration 執行後五個應用表與三個 legacy 表 RLS 開啟；正式 catalog 待部署核對。"
+    },
+    {
+      "id": "QA-02",
+      "status": "PASS",
+      "evidence": "前端無直接 table/view .from、REST 或 GraphQL；公開與編輯資料均由 P135 RPC 提供。"
+    },
+    {
+      "id": "QA-03",
+      "status": "PASS",
+      "evidence": "資料交換明確呼叫十一個命名 RPC 中必要項目；Auth、新聞擷取、Gemini 為獨立受控流程。"
+    },
+    {
+      "id": "QA-04",
+      "status": "REVIEW",
+      "evidence": "資料表分隔至 p135_data／p135_legacy，public 僅 RPC；實際 Dashboard Exposed Schemas 及 PostgREST table endpoint 必須在 staging／正式環境核對。"
+    },
+    {
+      "id": "QA-05",
+      "status": "PASS",
+      "evidence": "五個新表在同一 migration 內具精確 grants、RLS、policies、RPC EXECUTE，未使用 shared defaults。"
+    },
+    {
+      "id": "QA-06",
+      "status": "PASS",
+      "evidence": "本機 PostgreSQL 已執行 anon、一般登入者、唯一 owner 的允許／拒絕案例；覆蓋公開、草稿、私人資料、跨使用者連結。"
+    },
+    {
+      "id": "QA-07",
+      "status": "PASS",
+      "evidence": "公開資料另存無原文／筆記／UID 的白名單快照；RPC 明列必要欄位，無 SELECT *／to_jsonb 整列回傳。"
+    },
+    {
+      "id": "QA-08",
+      "status": "PASS",
+      "evidence": "PUBLIC EXECUTE 撤除；anon 只可呼叫三個公開 RPC。其餘均需 authenticated 並通過 owner 資格。"
+    },
+    {
+      "id": "QA-09",
+      "status": "PASS",
+      "evidence": "本版本十一個 RPC 全採 SECURITY INVOKER；沒有 DEFINER 例外。測試 fixture 的舊 DEFINER 只用來測遷移前環境。"
+    },
+    {
+      "id": "QA-10",
+      "status": "PASS",
+      "evidence": "所有 ID 為 UUID，不需要 sequence grants；Edge 使用使用者 token，沒有 service_role 憑證。"
+    },
+    {
+      "id": "QA-11",
+      "status": "PASS",
+      "evidence": "Chromium 實測密碼預設遮蔽、空白鍵顯示／隱藏、Enter 登入及登出清除私有內容。"
+    },
+    {
+      "id": "QA-12",
+      "status": "REVIEW",
+      "evidence": "本包無實際 config.js、真實 key／token；原遠端 Git 歷史及既有部署設定追蹤尚未改動，需另行盤點及規劃。"
+    },
+    {
+      "id": "QA-13",
+      "status": "PASS",
+      "evidence": "production SQL 只建立／操作 P135 名稱及專用 schema；只讀參照 auth.users 檢查指定 UID；無全域授權或跨 P 寫入。"
+    },
+    {
+      "id": "QA-14",
+      "status": "REVIEW",
+      "evidence": "同名 ZIP 外層、README、config-sample.js、database、docs 齊全。本輪為功能維護包，A3 宣傳海報未另製，後續展示交付時補製。"
+    },
+    {
+      "id": "QA-15",
+      "status": "PASS",
+      "evidence": "兩頁 Web Version 與本地 CSS/JS cache busting 均為 V0.03，不依賴既有 config.js 的舊版本值。"
+    }
+  ]
+}

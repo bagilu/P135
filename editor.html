@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>翻轉新聞｜編輯工作台</title>
+  <link rel="stylesheet" href="css/style.css?v=V0.03">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dark-theme">
+  <!-- 頂部導航列 -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="badge">P135</span>
+      <h1>翻轉新聞 · 編輯工作台</h1><a href="./" class="media-link">公開文章庫 ↗</a>
+    </div>
+    <div class="user-status">
+      <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
+      <span id="userStatusText">檢查認證狀態...</span>
+      <button id="authBtn" class="btn btn-sm">登入</button>
+      <span id="appVersionTag" class="version-tag">V0.03</span>
+    </div>
+  </header>
+
+  <!-- 三欄工作台 -->
+  <section id="accessMessage" class="access-message" role="status">正在檢查編輯資格…</section>
+  <main id="editorWorkspace" class="workspace-container" hidden>
+    <!-- 【左欄：循序操作 1 -> 2 -> 3】 -->
+    <section class="panel panel-left">
+      <!-- 步驟 1: 開啟新解讀 -->
+      <div class="step-box step-box-top">
+        <button id="btnNewArticle" class="btn btn-primary btn-block">✏️ (1) 開啟新解讀</button>
+      </div>
+
+      <!-- 步驟 2: 抓取填入 -->
+      <div class="step-box">
+        <label for="autoNewsUrl" class="step-label">
+          🔗 (2) 貼入新聞網址自動抓取 (
+          <a href="https://www.ltn.com.tw" target="_blank" rel="noopener noreferrer" class="media-link">自由</a> / 
+          <a href="https://udn.com/" target="_blank" rel="noopener noreferrer" class="media-link">聯合</a> / 
+          <a href="https://www.chinatimes.com" target="_blank" rel="noopener noreferrer" class="media-link">中時</a> / 
+          <a href="https://www.setn.com/catalog/politics" target="_blank" rel="noopener noreferrer" class="media-link">三立</a>
+          )
+        </label>
+        <div class="input-with-button">
+          <input type="url" id="autoNewsUrl" placeholder="https://news.ltn.com.tw/... 或 https://udn.com/...">
+          <button id="btnFetchUrl" class="btn btn-secondary btn-sm">抓取填入</button>
+        </div>
+      </div>
+
+      <!-- 新聞資料與全文輸入區 -->
+      <div class="form-group">
+        <label for="newsTitle">新聞標題</label>
+        <input type="text" id="newsTitle" placeholder="貼入或抓取之新聞標題...">
+      </div>
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="newsMedia">來源媒體</label>
+          <input type="text" id="newsMedia" placeholder="例如：自由時報、聯合報、三立新聞">
+        </div>
+        <div class="form-group flex-1">
+          <label for="newsDate">報導日期</label>
+          <input type="date" id="newsDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="newsUrl">原文連結 (選填)</label>
+        <input type="url" id="newsUrl" placeholder="https://...">
+      </div>
+      <div class="form-group flex-grow">
+        <label for="newsContent">新聞內文全文</label>
+        <textarea id="newsContent" placeholder="在此檢閱或貼入新聞長文..."></textarea>
+      </div>
+
+      <!-- 步驟 3: 進行 AI 多維解讀 -->
+      <div class="actions">
+        <button id="btnStartAnalyze" class="btn btn-primary btn-block">⚡ (3) 進行 AI 多維解讀</button>
+      </div>
+    </section>
+
+    <!-- 【中欄：多維度對照面板】 -->
+    <section class="panel panel-center">
+      <h2>多維度對照面板</h2>
+      <div class="tab-header">
+        <button class="tab-btn active" data-tab="tabNeutral">中性客觀改寫</button>
+        <button class="tab-btn" data-tab="tabFlip">顏色/立場對調</button>
+        <button class="tab-btn" data-tab="tabSentiment">情緒與用詞剖析</button>
+        <button class="tab-btn" data-tab="tabFactOpinion">事實 vs. 觀點</button>
+      </div>
+
+      <div class="tab-content active" id="tabNeutral">
+        <div class="diff-box" id="neutralContentBox">
+          <p class="placeholder-text">完成步驟 (3) 解讀後，此處產生客觀中性版本...</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tabFlip">
+        <div class="diff-box" id="flippedContentBox">
+          <p class="placeholder-text">立場對調版本將在此呈現...</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tabSentiment">
+        <div id="sentimentAnalysisBox">
+          <p class="placeholder-text">煽動指數與情緒修飾字眼分析...</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tabFactOpinion">
+        <div class="fact-opinion-grid">
+          <div class="fact-col">
+            <h3>📌 原文中的可查證陳述</h3>
+            <ul id="factsList"></ul>
+          </div>
+          <div class="opinion-col">
+            <h3>💭 主觀觀點與評論 (Opinions)</h3>
+            <ul id="opinionsList"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 【右欄：個人研判與事蹟存檔】 -->
+    <section class="panel panel-right">
+      <h2>個人研判與事蹟存檔</h2>
+      <div class="form-group">
+        <label for="personalNotes">私人筆記 / 我的研判</label>
+        <textarea id="personalNotes" placeholder="誰在此時得利？為何這個時間點爆出？背後博弈邏輯..."></textarea>
+      </div>
+
+      <div class="dossier-tool">
+        <h3>標記人物/組織事蹟 (懶人包)</h3>
+        <div class="form-group">
+          <input type="text" id="entityName" placeholder="實體名稱 (如：某政治人物、某部會)">
+        </div>
+        <div class="form-row">
+          <select id="entityType" class="flex-1">
+            <option value="person">政治人物</option>
+            <option value="party">政黨</option>
+            <option value="organization">政府/媒體組織</option>
+          </select>
+          <select id="eventType" class="flex-1">
+            <option value="negative">負向 / 爭議言行</option>
+            <option value="positive">正向政績</option>
+            <option value="controversy">立場轉彎 / 跳票</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="text" id="eventTitle" placeholder="事蹟一句話簡述">
+        </div>
+        <button id="btnAddEvent" class="btn btn-secondary">＋ 存入個人懶人包庫</button>
+      </div>
+
+      <!-- 步驟 4: 儲存本篇完整解讀 -->
+      <div class="actions">
+        <div class="publish-control"><label><input id="publishArticle" type="checkbox"> 公開這篇文章</label><p>勾選後按儲存才會公開；取消勾選並儲存即可取消公開。原新聞全文、個人筆記與事蹟庫不會公開。</p><p id="saveStatus" role="status"></p></div>
+        <button id="btnSaveAll" class="btn btn-success btn-block">💾 (4) 儲存草稿</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 歷史文章庫抽屜 (升級：加入搜尋與媒體過濾列) -->
+  <aside id="historyDrawer" class="history-drawer">
+    <div class="drawer-header">
+      <h3>📚 歷史解讀文章庫 <span id="historyCountTag" class="count-badge">0</span></h3>
+      <button id="btnCloseDrawer" class="btn-close">&times;</button>
+    </div>
+
+    <!-- 搜尋與過濾控制區 -->
+    <div class="drawer-filter-box">
+      <input type="text" id="historySearchInput" placeholder="搜尋已載入的標題或媒體…">
+      <div class="media-filter-tags" id="mediaFilterTags">
+        <button class="filter-chip active" data-media="ALL">全部</button>
+        <button class="filter-chip" data-media="自由時報">自由</button>
+        <button class="filter-chip" data-media="聯合報">聯合</button>
+        <button class="filter-chip" data-media="中國時報">中時</button>
+        <button class="filter-chip" data-media="三立新聞">三立</button>
+      </div>
+    </div>
+
+    <div class="drawer-body">
+      <ul id="historyList" class="history-list">
+        <li class="loading-text">載入中...</li>
+      </ul>
+      <button id="historyLoadMore" class="btn btn-secondary btn-block" hidden>載入更多歷史文章</button>
+    </div>
+  </aside>
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+
+  <dialog id="loginDialog" class="login-dialog" aria-labelledby="loginTitle">
+    <form id="loginForm">
+      <div class="login-heading">
+        <h2 id="loginTitle">登入翻轉新聞</h2>
+        <button id="btnCloseLogin" type="button" class="btn-close" aria-label="關閉登入視窗">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" autocomplete="username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">密碼</label>
+        <div class="password-control">
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+          <button id="btnTogglePassword" type="button" class="btn btn-secondary btn-sm" aria-controls="loginPassword" aria-pressed="false">顯示密碼</button>
+        </div>
+      </div>
+      <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
+      <button id="btnSubmitLogin" type="submit" class="btn btn-primary btn-block">登入</button>
+      <nav class="account-links" aria-label="帳號維護">
+        <a id="linkRegister" href="https://bagilu.github.io/P130/" target="_blank" rel="noopener noreferrer">前往帳號中心註冊</a>
+        <a id="linkForgotPassword" href="https://bagilu.github.io/P130/forgot-password.html" target="_blank" rel="noopener noreferrer">忘記密碼</a>
+        <a id="linkAccountCenter" href="https://bagilu.github.io/P130/" target="_blank" rel="noopener noreferrer">帳號設定</a>
+      </nav>
+    </form>
+  </dialog>
+
+  <!-- 快取更新：帶入 V0.03 -->
+  <script src="config.js?v=V0.03"></script>
+  <script src="js/supabase-client.js?v=V0.03"></script>
+  <script src="js/editor.js?v=V0.03"></script>
+</body>
+</html>

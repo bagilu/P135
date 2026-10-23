@@ -1,0 +1,89 @@
+{
+  "engine": "PGlite PostgreSQL WASM; isolated local database, Supabase auth.uid stub; actual Supabase gateway not tested",
+  "checks": [
+    {
+      "name": "migration guard rejects unexpected legacy grants atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "migration stops on legacy dependent view",
+      "status": "PASS"
+    },
+    {
+      "name": "complete atomic migration executes",
+      "status": "PASS"
+    },
+    {
+      "name": "legacy preserved; copied rows start as drafts",
+      "status": "PASS"
+    },
+    {
+      "name": "fail closed before owner setup",
+      "status": "PASS"
+    },
+    {
+      "name": "owner setup requires explicit existing Auth UID",
+      "status": "PASS"
+    },
+    {
+      "name": "designated owner recognized, other login not an editor",
+      "status": "PASS"
+    },
+    {
+      "name": "owner can list only own three migrated drafts",
+      "status": "PASS"
+    },
+    {
+      "name": "non-owner denied every editor and legacy write RPC",
+      "status": "PASS"
+    },
+    {
+      "name": "anon cannot call editor RPC or read private/legacy tables",
+      "status": "PASS"
+    },
+    {
+      "name": "other authenticated sees no private rows via SQL RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "owner publishes three snapshots atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "public projection never returns private fields or extra AI keys",
+      "status": "PASS"
+    },
+    {
+      "name": "date sorting, missing dates last and pagination",
+      "status": "PASS"
+    },
+    {
+      "name": "neighbors follow active ordering and filtering",
+      "status": "PASS"
+    },
+    {
+      "name": "owner cannot read or attach another users article",
+      "status": "PASS"
+    },
+    {
+      "name": "unpublish removes public detail and list immediately",
+      "status": "PASS"
+    },
+    {
+      "name": "legacy private data and notes remain untouched",
+      "status": "PASS"
+    },
+    {
+      "name": "all P135 RPCs INVOKER; no PUBLIC or anon editor execution",
+      "status": "PASS"
+    },
+    {
+      "name": "migration rerun aborts without replacing current data",
+      "status": "PASS"
+    },
+    {
+      "name": "permissions repair and read-only health check execute",
+      "status": "PASS"
+    }
+  ]
+}

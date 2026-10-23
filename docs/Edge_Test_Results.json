@@ -1,0 +1,53 @@
+{
+  "environment": "TypeScript transpile + isolated Node VM; actual DOM parser, mocked Supabase Auth/RPC and mocked upstream HTTP. No paid API or live Supabase calls.",
+  "checks": [
+    {
+      "name": "scraper rejects absent or invalid identity before fetching",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper rejects logged-in non-editor before fetching",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper blocks spoofed hosts, private hosts and HTTP",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper rejects unsafe redirect without following it",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper extracts title/date/content from actual DOM parser",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper does not report empty extraction as success",
+      "status": "PASS"
+    },
+    {
+      "name": "scraper enforces response size cap",
+      "status": "PASS"
+    },
+    {
+      "name": "AI endpoint rejects non-editor and missing title/content",
+      "status": "PASS"
+    },
+    {
+      "name": "AI fallback returns validated JSON; key absent from URL",
+      "status": "PASS"
+    },
+    {
+      "name": "AI rejects malformed analysis instead of returning status 200",
+      "status": "PASS"
+    },
+    {
+      "name": "AI permission error is not mislabeled as model busy",
+      "status": "PASS"
+    },
+    {
+      "name": "Dashboard single-file variants contain working owner gates",
+      "status": "PASS"
+    }
+  ]
+}

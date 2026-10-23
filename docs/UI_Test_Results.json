@@ -1,0 +1,73 @@
+{
+  "environment": "LinkeDOM actual document parser + Node VM + mocked RPC/Auth. Not a rendered Chromium or live Supabase test; physical wrap/keyboard/focus still require real browser review.",
+  "checks": [
+    {
+      "name": "public home loads 40 tags without requesting sign-in",
+      "status": "PASS"
+    },
+    {
+      "name": "tags use varying widths and safe title text; CSS wraps equal-height tags",
+      "status": "PASS"
+    },
+    {
+      "name": "load more retrieves remaining articles",
+      "status": "PASS"
+    },
+    {
+      "name": "reader hides raw article/notes, blocks unsafe source URL and renders text safely",
+      "status": "PASS"
+    },
+    {
+      "name": "next article, safe original link and return position",
+      "status": "PASS"
+    },
+    {
+      "name": "sort change and keyword search reset the visible result set",
+      "status": "PASS"
+    },
+    {
+      "name": "unpublished or unavailable article shows no reader content",
+      "status": "PASS"
+    },
+    {
+      "name": "connection failure offers a retry action",
+      "status": "PASS"
+    },
+    {
+      "name": "editor workspace starts hidden and requires login",
+      "status": "PASS"
+    },
+    {
+      "name": "password toggle keeps value and failed login stays private",
+      "status": "PASS"
+    },
+    {
+      "name": "other registered account cannot open editor",
+      "status": "PASS"
+    },
+    {
+      "name": "designated editor can enter workspace after login",
+      "status": "PASS"
+    },
+    {
+      "name": "private history restores full analysis and saved reading feeling",
+      "status": "PASS"
+    },
+    {
+      "name": "publish and unpublish controls send explicit private/public state",
+      "status": "PASS"
+    },
+    {
+      "name": "new URL clears old analysis, notes and publication state",
+      "status": "PASS"
+    },
+    {
+      "name": "draft save and subsequent AI analysis preserve reading feeling",
+      "status": "PASS"
+    },
+    {
+      "name": "logout hides and clears private content",
+      "status": "PASS"
+    }
+  ]
+}

@@ -489,3 +489,20 @@ textarea {
 .drawer-overlay.open {
   display: block;
 }
+
+
+/* V0.02：P135 自行登入，帳號生命週期由 P130 處理。 */
+.login-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 24px; border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); background: var(--bg-panel); }
+.login-dialog::backdrop { background: rgba(0, 0, 0, .7); }
+.login-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.login-heading h2 { margin: 0; font-size: 1.15rem; }
+.password-control { display: flex; gap: 8px; align-items: stretch; }
+.password-control input { min-width: 0; flex: 1; }
+.password-control button { white-space: nowrap; }
+.login-error { color: #fca5a5; min-height: 1.5em; font-size: .88rem; }
+.account-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: .85rem; }
+.account-links a { color: #93c5fd; text-underline-offset: 3px; }
+.login-dialog button:focus-visible, .login-dialog a:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+
+[hidden]{display:none!important}.access-message{padding:42px 24px;color:var(--text-muted);max-width:720px;margin:0 auto;line-height:1.8}.publish-control{font-size:.85rem;margin-bottom:12px;line-height:1.6}.publish-control label{display:flex;align-items:center;gap:8px}.publish-control p{font-size:.75rem;color:var(--text-muted);margin:6px 0}.history-item{display:block;width:100%;text-align:left;font:inherit;color:var(--text-main)}.history-state{color:#93c5fd;margin-right:6px}#historyLoadMore{margin-top:12px}#saveStatus{white-space:pre-wrap;color:#b9d9ff}.analysis-note{font-size:.75rem;color:var(--text-muted)}
+@media(max-width:1000px){body.dark-theme{height:auto;min-height:100dvh;overflow:auto}.app-header{flex-wrap:wrap;gap:12px;padding:14px}.brand{flex-wrap:wrap}.user-status{flex-wrap:wrap}.workspace-container{flex-direction:column;overflow:visible}.panel{overflow:visible;min-height:0}textarea{min-height:180px}.history-drawer{max-width:100vw}.fact-opinion-grid{flex-direction:column}}

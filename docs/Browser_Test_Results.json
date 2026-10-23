@@ -1,0 +1,54 @@
+{
+  "environment": "Chromium 153 + actual PGlite PostgreSQL migration/RLS/RPC via in-process bridge; mocked Auth and AI upstream only; desktop 1440px and mobile 390px. Not the deployed Supabase gateway.",
+  "checks": [
+    {
+      "name": "real browser anonymous RPC list loads 40 tags from actual local PostgreSQL",
+      "status": "PASS"
+    },
+    {
+      "name": "rendered tags have equal height, variable width and wrap",
+      "status": "PASS"
+    },
+    {
+      "name": "load more and mobile layout do not overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous editor gate and keyboard password toggle",
+      "status": "PASS"
+    },
+    {
+      "name": "actual SQL denies editor access to other login",
+      "status": "PASS"
+    },
+    {
+      "name": "owner signs in and publishes analysis through new SQL RPC",
+      "status": "PASS"
+    },
+    {
+      "name": "public reader sees four analyses and never original text or private notes",
+      "status": "PASS"
+    },
+    {
+      "name": "unpublish via editor makes public detail unavailable",
+      "status": "PASS"
+    },
+    {
+      "name": "browser history selection returns private reading feeling and notes",
+      "status": "PASS"
+    },
+    {
+      "name": "reader sort and previous-next follow same result order",
+      "status": "PASS"
+    },
+    {
+      "name": "owner logout clears private work area",
+      "status": "PASS"
+    },
+    {
+      "name": "no browser runtime errors",
+      "status": "PASS"
+    }
+  ],
+  "rpc_calls": 20
+}
