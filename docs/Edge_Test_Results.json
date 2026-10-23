@@ -46,7 +46,67 @@
       "status": "PASS"
     },
     {
+      "name": "reported 503-404-503 pattern returns service failure with one bounded retry",
+      "status": "PASS"
+    },
+    {
+      "name": "default fallback switches from overloaded 3.8 to supported Flash-Lite",
+      "status": "PASS"
+    },
+    {
+      "name": "transient server failure can recover on a single delayed retry",
+      "status": "PASS"
+    },
+    {
+      "name": "all 404 results identify model configuration and are never retried",
+      "status": "PASS"
+    },
+    {
+      "name": "quota errors preserve 429 and are not automatically retried",
+      "status": "PASS"
+    },
+    {
+      "name": "bad upstream request remains an HTTP configuration error, not invalid analysis",
+      "status": "PASS"
+    },
+    {
+      "name": "other upstream HTTP errors are not mislabeled as malformed analysis",
+      "status": "PASS"
+    },
+    {
+      "name": "timeouts return 504 without starting an extra retry",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid model setting stops before external requests",
+      "status": "PASS"
+    },
+    {
+      "name": "model prefixes are normalized, deduplicated and capped at three candidates",
+      "status": "PASS"
+    },
+    {
+      "name": "content block is reported directly without probing fallback or retries",
+      "status": "PASS"
+    },
+    {
+      "name": "truncated generations report output length instead of generic busy status",
+      "status": "PASS"
+    },
+    {
+      "name": "reasoning parts are excluded from analysis JSON",
+      "status": "PASS"
+    },
+    {
+      "name": "upstream messages and secrets never enter error text or logs",
+      "status": "PASS"
+    },
+    {
       "name": "Dashboard single-file variants contain working owner gates",
+      "status": "PASS"
+    },
+    {
+      "name": "Dashboard AI single-file version performs the same overload fallback",
       "status": "PASS"
     }
   ]

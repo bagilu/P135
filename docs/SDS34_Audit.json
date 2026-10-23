@@ -1,10 +1,10 @@
 {
   "project": "P135",
   "SDS_version": "3.4",
-  "web_version": "V0.04.1",
-  "source_baseline": "GitHub main 58ab6a7b0d6c329a8c92bef59f4bb3c5b1477536 (V0.04) + user catalog confirming public.TblP135_SwapRules",
-  "checked_at": "2026-10-23T13:35:46.712497+08:00",
-  "local_test_cases": 70,
+  "web_version": "V0.04.2",
+  "source_baseline": "GitHub 2ea8c6ece81998e656a8bd0be46ffb473c3bc1a4 (V0.04.1), actual Gemini 503/404/503 logs supplied by user",
+  "checked_at": "2026-10-23T14:12:18.481916+08:00",
+  "local_test_cases": 85,
   "local_failures": 0,
   "release_status": "Local checks passed; live Supabase deployment REVIEW",
   "human_reviewer": "使用者已確認舊資料可捨棄並要求直接更新 schema 與 GitHub",
@@ -37,7 +37,7 @@
     {
       "id": "QA-06",
       "status": "PASS",
-      "evidence": "隔離 PostgreSQL 與 Chromium 測試公開／草稿、owner／其他登入者／訪客、跨使用者拒絕與失敗原子回復。"
+      "evidence": "85 項本地測試通過，含原 503/404/503 重現、備援成功、最多一次暫時 HTTP 失敗額外重試、配額／逾時／內容封鎖／格式分類、診斷不含金鑰或新聞；真實 Gemini 仍待部署驗證。"
     },
     {
       "id": "QA-07",
@@ -82,7 +82,7 @@
     {
       "id": "QA-15",
       "status": "PASS",
-      "evidence": "兩頁顯示 V0.04.1，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。"
+      "evidence": "前端顯示與本地 CSS/JS cache 均 V0.04.2；資料庫 SQL 保持 V0.04.1 逐位元組相同，既有環境只更新分析 Edge。"
     }
   ],
   "supabase_changes_performed": false

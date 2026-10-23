@@ -1,4 +1,22 @@
-# P135 翻轉新聞 FlipNews — V0.04.1
+# P135 翻轉新聞 FlipNews — V0.04.2
+
+## 已完成 V0.04.1 初始化：本次只更新 AI 分析函式
+
+**既有資料庫與文章保留，不要再次執行任何初始化 SQL。**
+
+1. 在 Supabase Edge Functions → P135-analyze-news → Code，以 `docs/dashboard-single-file/P135-analyze-news.ts` 全部原碼覆蓋並重新部署。Verify JWT 保持 ON。擷取函式不需重新部署。
+2. 在 Edge Functions → Secrets 將 AI_MODELS 設為 `gemini-3.8-flash,gemini-3.5-flash-lite`，保留原 AI_API_KEY。設定值不放入 config.js 或 GitHub。兩個模型會依序嘗試；Flash-Lite 是不同能力／速度取向的備援，不宣稱輸出品質相同。
+3. 重新整理網站，登入後對同一篇新聞再執行一次分析。成功時 Logs 顯示 `P135 analysis model <模型> V0.04.2`。
+4. 若仍失敗，回傳會包含模型名稱、HTTP 狀態或逾時／格式原因；Logs 的 `P135 AI attempt` 只記錄受控診斷，沒有新聞或金鑰。503 仍可能是外部服務尚未恢復，本版不保證上游供應狀態。
+
+修正：移除預設 2.5／舊 3.5 Flash 候選，保留 3.8 主模型並加入支援中的 3.5 Flash-Lite；暫時 HTTP 失敗在備援之後最多額外重試一次（短暫等待），不對 400／404／429 或內容封鎖額外重試。最長仍受每次 25 秒與最多四次外部請求限制，沒有無限重試。Google 新版模型已不建議自訂 temperature，本版移除該參數。
+
+頁面版本與 cache 更新為 V0.04.2；資料庫格式／全部 SQL 和 V0.04.1 逐位元組相同。更新 GitHub 不會自動部署 Supabase Edge Functions。
+
+來源與限制見 `docs/AI_Recovery.md`；完整測試結果見 `docs/SDS34_Audit.md`。
+
+## 以下只供全新環境安裝
+
 
 公開閱讀、唯一編輯者維護的個人政治新聞分析庫。延續 V0.03 的文章標籤首頁、日期雙向排序、搜尋、分析閱讀、上一篇／下一篇及底部編輯入口。
 

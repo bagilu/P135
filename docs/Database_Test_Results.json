@@ -1,5 +1,6 @@
 {
-  "web_version": "V0.04.1",
+  "web_version": "V0.04.2",
+  "schema_version": "V0.04.1",
   "engine": "Isolated PGlite PostgreSQL; synthetic Auth users; actual Supabase gateway not tested",
   "checks": [
     {

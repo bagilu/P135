@@ -1,3 +1,19 @@
+# P135 V0.04.2 更新
+
+## 已有 V0.04.1 資料庫的本次部署
+
+**這次不執行任何 SQL，不清除文章，不需再設定編輯者。**
+
+1. 在 Supabase Edge Functions 的 P135-analyze-news → Code，覆蓋本包 docs/dashboard-single-file/P135-analyze-news.ts 全部原碼後部署；Verify JWT 保持 ON。
+2. Edge Functions → Secrets 設定 AI_MODELS：gemini-3.8-flash,gemini-3.5-flash-lite。保留原 AI_API_KEY。已有 AI_MODELS 時覆蓋舊清單，否則舊 Secret 會繼續優先於程式預設值。
+3. P135-scrape-news 與 _shared/p135-auth.ts 沒有修改，不需為本次更新重新部署擷取函式。CLI 使用者只部署 P135-analyze-news，其共用 auth import 一起打包。
+4. GitHub 前端版本為 V0.04.2，現有 config.js 保留。登入編輯工作台測試一次分析，再確認草稿／公開儲存。
+5. 成功執行紀錄會記錄實際模型與 V0.04.2；失敗時 P135 AI attempt 顯示模型、kind 與 HTTP status，不記錄原文、上游錯誤本文、key 或 token。
+
+全部 database/*.sql 與 V0.04.1 相同；下方初始化步驟只供從未安裝新版的環境使用。
+
+---
+
 # P135 V0.04.1 全新安裝
 
 ## 適用範圍與授權

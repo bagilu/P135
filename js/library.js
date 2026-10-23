@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(reset){state.offset=0;$('articleTags').replaceChildren();}
     state.loading=true;$('btnLoadMore').hidden=true;$('btnRetry').hidden=true;status('正在載入文章…');
     try{
-      if(!api)throw new Error('尚未設定網站連線。請由管理者保留原有 config.js，並確認 V0.04.1 資料庫已部署。');
+      if(!api)throw new Error('尚未設定網站連線。請由管理者保留原有 config.js，並確認 P135 資料庫已完成設定。');
       const rows=await api.listPublic({offset:state.offset,ascending:state.ascending,query:state.query});
       if(token!==state.listToken)return;
       const list=Array.isArray(rows)?rows:[];list.forEach(addTag);state.offset+=list.length;state.hasMore=list.length===40;

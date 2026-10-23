@@ -1,3 +1,5 @@
-# V0.04.1
+# V0.04.2
 
-修正舊庫含 TblP135_SwapRules 時無法初始化。請改用本版完整 10_P135_FreshInstall.sql，重新填入自己的 Auth UID。新增清除範圍僅此一張已確認的 P135 舊測試表；保留 RESTRICT、同筆交易與防重跑。若先前停於未知物件檢查，尚未建立新版 schema，可執行修正版。兩個 Edge 的程式碼與 V0.04 相同。
+已安裝 V0.04.1 的使用者，只需重新部署 P135-analyze-news 的單檔原碼，並把 Secrets 的 AI_MODELS 設為 gemini-3.8-flash,gemini-3.5-flash-lite；保留 AI_API_KEY 與 Verify JWT ON。
+
+**不執行 SQL、不重建資料庫、不清除文章。** 擷取函式不變。前端版本與快取號更新；Gemini 真實可用性需部署後測試。

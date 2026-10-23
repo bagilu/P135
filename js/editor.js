@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   'use strict';
   const $=id=>document.getElementById(id),api=window.P135_API;
   let canEdit=false,authEpoch=0,currentId=null,analysis=null,previouslyPublished=false,dirty=false,revision=0,documentToken=0,changeCounter=0,historyRows=[],historyOffset=0,historyMore=false,historyBusy=false,media='ALL';
-  $('appVersionTag').textContent='V0.04.1';
+  $('appVersionTag').textContent='V0.04.2';
   const text=(id,value)=>{$(id).textContent=typeof value==='string'?value:'';};
   const list=(id,rows,empty)=>{const el=$(id);el.replaceChildren();for(const row of Array.isArray(rows)&&rows.length?rows:[empty]){const li=document.createElement('li');li.textContent=typeof row==='string'?row:'';el.append(li);}};
   function assertEditor(){if(!canEdit)throw new Error('請使用已授權的編輯帳號登入。');}
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!user){text('accessMessage','編輯工作台僅供授權帳號使用，請按右上角「登入」。一般讀者請返回公開文章庫。');return;}
     text('accessMessage','正在確認 P135 編輯資格…');
     try{const allowed=await api.editorStatus();if(epoch!==authEpoch)return;if(!allowed){text('accessMessage','此帳號沒有 P135 編輯權限。若您是擁有者，請依部署說明完成唯一編輯帳號設定。');return;}canEdit=true;$('accessMessage').hidden=true;$('editorWorkspace').hidden=false;}
-    catch(e){if(epoch===authEpoch)text('accessMessage',`無法確認編輯資格：${e.message}\n請確認 V0.04.1 初始化與編輯者設定已完成。`);}
+    catch(e){if(epoch===authEpoch)text('accessMessage',`無法確認編輯資格：${e.message}\n請確認 P135 資料庫與編輯者設定已完成。`);}
   }
   const dialog=$('loginDialog'),password=$('loginPassword'),toggle=$('btnTogglePassword');
   function mask(){password.type='password';toggle.textContent='顯示密碼';toggle.setAttribute('aria-pressed','false');}
