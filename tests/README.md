@@ -1,11 +1,9 @@
-# P135 V0.05 測試
+# P135 V0.06 驗證
 
-在 tests 目錄 npm install。
+在 tests 執行 npm install。`npm test` 包含 database.cjs、edge.cjs、ui.cjs 與 pagination.cjs；`npm run test:browser` 需 Chromium，或指定 P135_CHROMIUM_PATH。
 
-本次前端變更：執行 `node ui.cjs`（17 項）、`node pagination.cjs`（8 項）及 `npm run test:browser`（12 項），共 37 項。瀏覽器需先 `npx playwright install chromium`，或設定 P135_CHROMIUM_PATH 指向 Chromium。
+本次私人化測試：database 19、ui 13、pagination 8，browser 17，合計 57 項。資料庫測試先從 v0051-install.sql.fixture 建立可公開讀取的合成舊庫，再執行 30 私人化並驗證拒絕與資料保留；browser 使用當版全新安裝、本地 PostgreSQL/RLS/RPC 及合成 Auth／AI。
 
-browser.cjs 使用本版原有 SQL 在隔離 PGlite PostgreSQL 建立 243 篇合成文章，實測 100 → 200 → 243 捲動載入、等高不同寬標籤、五種底色、日期色塊、頁首高度、390px 手機版及既有編輯／閱讀權限流程；Auth 與外部 AI 模擬。pagination.cjs 使用受控 observer／RPC，涵蓋同時請求、網路失敗、接續重試、搜尋競態與終止條件。
+包含匿名／其他帳號拒絕、原文與筆記保留、舊公開路徑拒絕、100→200→243、全文純文字、登入／登出／失效、延遲回應不回填、同分頁進入編輯工作台、跨分頁登出與 BFCache 生命週期。SDK 將 session 指向 sessionStorage 的設定另由 UI VM 驗證。
 
-`npm test` 額外包括原資料庫及 Edge 測試。此次 SQL／Edge 沒有改動，因此保留舊版 DB／Edge 報告，沒有重跑或計入上述 37 項。
-
-所有測試不連遠端 Supabase、不使用真實資料或付費 AI。fixtures 僅為隔離測試起點，不能部署。tests/scratch 為內部檢查，不包含於 ZIP 或 GitHub。測試會更新 docs 結果，校驗碼需重新生成。
+Edge 程式碼未修改，其既有報告保留而未重新計入本次測試數。所有測試使用假資料，沒有連線正式 Supabase 或呼叫付費 AI。fixtures 不能部署；tests/scratch 的內部截圖不納入 ZIP/GitHub。

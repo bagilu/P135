@@ -1,48 +1,69 @@
 {
-  "environment": "Chromium 153 + actual PGlite PostgreSQL fresh install/RLS/RPC via in-process bridge; mocked Auth and AI upstream only; desktop 1440px and mobile 390px. Not the deployed Supabase gateway.",
+  "web_version": "V0.06",
+  "environment": "Chromium + isolated PostgreSQL/PGlite; real private RLS/RPC and rendered frontend; simulated Auth/AI only. Not live Supabase.",
   "checks": [
     {
-      "name": "real browser anonymous RPC list loads 100 tags from actual local PostgreSQL",
+      "name": "anonymous home and direct article links show only the login gate without article RPC calls",
       "status": "PASS"
     },
     {
-      "name": "rendered tags have equal height, variable width and wrap",
+      "name": "password reveal supports keyboard and a failed login shows no private content",
       "status": "PASS"
     },
     {
-      "name": "scroll automatically appends 100 then final 43, and mobile layout does not overflow",
+      "name": "another registered account is refused and never requests article data",
       "status": "PASS"
     },
     {
-      "name": "anonymous editor gate and keyboard password toggle",
+      "name": "owner login retrieves 100 private articles, including former drafts",
       "status": "PASS"
     },
     {
-      "name": "actual SQL denies editor access to other login",
+      "name": "compact colored tags and header remain correct after privatization",
       "status": "PASS"
     },
     {
-      "name": "owner signs in and publishes analysis through new SQL RPC",
+      "name": "scroll loads 100 then 43 more without public RPC calls",
       "status": "PASS"
     },
     {
-      "name": "public reader sees four analyses and never original text or private notes",
+      "name": "private article shows stored original text as plain text before analyses",
       "status": "PASS"
     },
     {
-      "name": "unpublish via editor makes public detail unavailable",
+      "name": "fact/opinion colors remain green/red and mobile stacks without overflow",
       "status": "PASS"
     },
     {
-      "name": "browser history selection returns private reading feeling and notes",
+      "name": "previous/next follows the current sorted private results and back retains loaded tags",
       "status": "PASS"
     },
     {
-      "name": "reader sort and previous-next follow same result order",
+      "name": "same tab can open editor with its private session and no publish control",
       "status": "PASS"
     },
     {
-      "name": "owner logout clears private work area",
+      "name": "owner saves an unanalyzed private original and reads it from the library",
+      "status": "PASS"
+    },
+    {
+      "name": "logout immediately removes original, analysis, article titles and navigation handlers",
+      "status": "PASS"
+    },
+    {
+      "name": "session expiry relocks the reader and discards private data",
+      "status": "PASS"
+    },
+    {
+      "name": "a new independent browser tab starts at login",
+      "status": "PASS"
+    },
+    {
+      "name": "signing out in one tab also locks another signed-in tab",
+      "status": "PASS"
+    },
+    {
+      "name": "browser back-forward page lifecycle clears and rechecks private DOM",
       "status": "PASS"
     },
     {
@@ -50,5 +71,5 @@
       "status": "PASS"
     }
   ],
-  "rpc_calls": 21
+  "rpc_calls": 35
 }

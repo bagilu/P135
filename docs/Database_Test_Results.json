@@ -1,122 +1,81 @@
 {
-  "web_version": "V0.04.2",
-  "schema_version": "V0.04.1",
-  "engine": "Isolated PGlite PostgreSQL; synthetic Auth users; actual Supabase gateway not tested",
+  "web_version": "V0.06",
+  "engine": "Isolated PostgreSQL via PGlite; upgrades a V0.05.1 fixture containing synthetic originals and published snapshots. Not live Supabase.",
   "checks": [
     {
-      "name": "missing owner UID stops before clearing original data",
+      "name": "baseline proves former anonymous article endpoint was readable",
       "status": "PASS"
     },
     {
-      "name": "unknown Auth UID stops without dropping original table",
+      "name": "upgrade preserves every stored article, original text, note and timestamp",
       "status": "PASS"
     },
     {
-      "name": "exposed private schema setting blocks initialization",
+      "name": "former snapshots are preserved as inaccessible history",
       "status": "PASS"
     },
     {
-      "name": "existing new schema blocks destructive action",
+      "name": "all three former public RPCs deny anonymous and every logged-in account",
       "status": "PASS"
     },
     {
-      "name": "dependent view blocks restricted drop and rolls back install",
+      "name": "anonymous cannot call any private reading or editor RPC",
       "status": "PASS"
     },
     {
-      "name": "other project foreign key blocks drop without cascading",
+      "name": "other account has no project access and cannot list, read, navigate or save",
       "status": "PASS"
     },
     {
-      "name": "other project FK to SwapRules aborts reset and preserves all original tables",
+      "name": "former snapshot table denies direct access even with known schema name",
       "status": "PASS"
     },
     {
-      "name": "unknown P135 overload stops for review",
+      "name": "RLS blocks a different user from reading original text directly",
       "status": "PASS"
     },
     {
-      "name": "unknown P135 table is not silently removed",
+      "name": "owner can list all 243 articles including former drafts in 100-row batches",
       "status": "PASS"
     },
     {
-      "name": "clean install creates empty library and removes only old P135 tables",
+      "name": "search, sort and neighbor traversal share one full-library order",
       "status": "PASS"
     },
     {
-      "name": "confirmed old SwapRules table with data and its primary-key index are removed",
+      "name": "article detail returns the owner original and notes without losing line breaks",
       "status": "PASS"
     },
     {
-      "name": "shared Auth and other project rows, ACL, RLS and policy unchanged",
+      "name": "foreign article rows are excluded even for the configured owner",
       "status": "PASS"
     },
     {
-      "name": "five RLS tables; eleven INVOKER RPCs; only three public APIs",
+      "name": "save ignores attempts to publish and never updates or recreates old snapshots",
       "status": "PASS"
     },
     {
-      "name": "designated owner ready immediately; another login is not editor",
+      "name": "saving an unanalyzed article is allowed and it appears in the private library",
       "status": "PASS"
     },
     {
-      "name": "empty public library loads for anonymous visitor",
+      "name": "migration and permissions repair can rerun without reopening public access",
       "status": "PASS"
     },
     {
-      "name": "anonymous cannot call editor RPC or select private article data",
+      "name": "all P135 tables keep RLS enabled and all functions keep SECURITY INVOKER",
       "status": "PASS"
     },
     {
-      "name": "ordinary registered user cannot call private editor APIs",
+      "name": "other P projects and shared Auth users remain unchanged",
       "status": "PASS"
     },
     {
-      "name": "owner creates drafts and restores private notes through API",
+      "name": "health check reports private mode ready without exposing article content",
       "status": "PASS"
     },
     {
-      "name": "drafts remain absent from public list and direct detail",
-      "status": "PASS"
-    },
-    {
-      "name": "cross-user article reads and links denied; nonowner private RLS closed",
-      "status": "PASS"
-    },
-    {
-      "name": "owner publishes snapshots while retaining private data",
-      "status": "PASS"
-    },
-    {
-      "name": "public whitelist excludes original, notes, UID and nested extras",
-      "status": "PASS"
-    },
-    {
-      "name": "date sorting, missing dates last, query and pagination work",
-      "status": "PASS"
-    },
-    {
-      "name": "neighbor APIs follow identical search and date ordering",
-      "status": "PASS"
-    },
-    {
-      "name": "owner adds entity event and retrieves private dossier",
-      "status": "PASS"
-    },
-    {
-      "name": "unpublish removes anonymous list item and direct detail immediately",
-      "status": "PASS"
-    },
-    {
-      "name": "accidental rerun preserves new articles and published content",
-      "status": "PASS"
-    },
-    {
-      "name": "permissions repair and read-only health check execute",
-      "status": "PASS"
-    },
-    {
-      "name": "installation works when original P135 tables and RPCs never existed",
+      "name": "new installation finishes privately with no transient committed public phase",
       "status": "PASS"
     }
   ]

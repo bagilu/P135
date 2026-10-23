@@ -2,21 +2,32 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="政治新聞的中性改寫、立場對調與用詞分析。閱讀已公開的翻轉新聞分析。">
-  <title>翻轉新聞 FlipNews｜政治新聞分析庫</title>
-  <link rel="stylesheet" href="css/library.css?v=V0.05.1">
+  <meta name="description" content="僅供指定帳號登入的私人新聞知識庫。">
+  <title>翻轉新聞 FlipNews｜私人新聞知識庫</title>
+  <link rel="stylesheet" href="css/library.css?v=V0.06">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="./"><span class="project">P135</span><span>翻轉新聞 <small>FlipNews</small></span></a><span class="version">V0.05.1</span></header>
+  <header class="site-header"><a class="brand" href="./"><span class="project">P135</span><span>翻轉新聞 <small>FlipNews</small></span></a><div class="header-account"><span id="accountLabel"></span><button id="btnSignOut" type="button" hidden>登出</button><span class="version">V0.06</span></div></header>
   <main>
-    <section id="libraryView" class="library-view" aria-labelledby="libraryTitle">
-      <div class="intro"><h1 id="libraryTitle">換個角度，讀新聞。</h1><p>一份公開的政治新聞分析庫。從標題出發，閱讀不同角度的解讀。</p></div>
+    <section id="accessGate" class="access-gate" aria-labelledby="loginTitle">
+      <p class="eyebrow">PERSONAL KNOWLEDGE LIBRARY</p><h1 id="loginTitle">私人新聞知識庫</h1>
+      <p>請以您的指定帳號登入。</p>
+      <p id="accessStatus" class="status" role="status">正在確認登入狀態…</p>
+      <form id="loginForm" class="private-login">
+        <label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required>
+        <label for="loginPassword">密碼</label><div class="password-control"><input id="loginPassword" type="password" autocomplete="current-password" required><button id="btnTogglePassword" type="button" aria-controls="loginPassword" aria-pressed="false">顯示密碼</button></div>
+        <p id="loginError" class="status error" role="alert"></p><button id="btnSubmitLogin" type="submit">登入</button>
+        <a id="linkForgotPassword" href="https://bagilu.github.io/P130/forgot-password.html" target="_blank" rel="noopener noreferrer">忘記密碼</a>
+      </form>
+    </section>
+    <section id="libraryView" hidden class="library-view" aria-labelledby="libraryTitle">
+      <div class="intro"><h1 id="libraryTitle">我的新聞知識庫。</h1><p>收藏新聞全文、閱讀分析與整理想法。</p></div>
       <form id="filterForm" class="toolbar" role="search">
         <label class="search-field"><span class="sr-only">搜尋標題或媒體</span><input id="searchInput" type="search" placeholder="搜尋標題或媒體…" maxlength="150"><button type="submit">搜尋</button></label>
         <label>日期排序<select id="sortOrder"><option value="desc">新到舊</option><option value="asc">舊到新</option></select></label>
       </form>
-      <div class="list-heading"><span>已公開文章</span><span id="listCount" aria-live="polite"></span></div>
+      <div class="list-heading"><span>已收藏文章</span><span id="listCount" aria-live="polite"></span></div>
       <p id="libraryStatus" class="status" role="status">正在載入文章…</p>
       <ul id="articleTags" class="article-tags" aria-label="文章清單" aria-busy="false"></ul>
       <div id="loadSentinel" class="load-sentinel" aria-hidden="true"></div>
@@ -29,7 +40,8 @@
       <p id="readerStatus" class="status" role="status"></p>
       <div id="readerBody" hidden>
         <header class="article-heading"><p class="eyebrow">FLIPNEWS / READING</p><h1 id="readerTitle" tabindex="-1"></h1><div class="article-meta"><time id="readerDate"></time><span id="readerMedia"></span><a id="sourceLink" target="_blank" rel="noopener noreferrer">前往原新聞 ↗</a></div></header>
-        <nav id="sectionNav" class="section-nav" aria-label="分析段落"><button data-section="neutralSection">中性改寫</button><button data-section="flipSection">立場對調</button><button data-section="sentimentSection">情緒用詞</button><button data-section="factsSection">事實與觀點</button></nav>
+        <nav id="sectionNav" class="section-nav" aria-label="文章段落"><button data-section="originalSection">新聞全文</button><button data-section="neutralSection">中性改寫</button><button data-section="flipSection">立場對調</button><button data-section="sentimentSection">情緒用詞</button><button data-section="factsSection">事實與觀點</button></nav>
+        <section id="originalSection" class="analysis-section"><div class="section-number">00</div><div><h2>新聞全文</h2><div id="originalText" class="reading-text original-text"></div></div></section>
         <section id="neutralSection" class="analysis-section"><div class="section-number">01</div><div><h2>中性客觀改寫</h2><div id="neutralText" class="reading-text"></div></div></section>
         <section id="flipSection" class="analysis-section"><div class="section-number">02</div><div><h2>立場對調</h2><div id="flippedText" class="reading-text"></div><div id="feelingBlock" class="reading-note" hidden><h3>閱讀感受分析</h3><p id="feelingText"></p></div><p class="fine-print">此為角色與立場對調的模擬改寫，不代表真實事件。</p></div></section>
         <section id="sentimentSection" class="analysis-section"><div class="section-number">03</div><div><h2>情緒與用詞剖析</h2><p id="toneText" class="reading-note"></p><ul id="loadedWords" class="analysis-list"></ul></div></section>
@@ -38,6 +50,6 @@
       </div>
     </article>
   </main>
-  <footer class="site-footer"><p>慈濟大學 經營管理學系 <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener noreferrer">好玩實驗室</a> 作品</p><p>AI 分析提供閱讀參考；原始報導請見各文章來源連結。</p><a class="editor-entry" href="editor.html">編輯工作台</a></footer>
-  <script src="config.js?v=V0.05.1"></script><script src="js/supabase-client.js?v=V0.05.1"></script><script src="js/library.js?v=V0.05.1"></script>
+  <footer class="site-footer"><p>慈濟大學 經營管理學系 <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener noreferrer">好玩實驗室</a> 作品</p><p>私人收藏與閱讀分析；原始報導請見文章來源連結。</p><a id="editorEntry" class="editor-entry" href="editor.html" hidden>編輯工作台</a></footer>
+  <script src="config.js?v=V0.06"></script><script src="js/supabase-client.js?v=V0.06"></script><script src="js/library.js?v=V0.06"></script>
 </body></html>

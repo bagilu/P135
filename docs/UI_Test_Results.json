@@ -1,72 +1,57 @@
 {
-  "environment": "LinkeDOM actual document parser + Node VM + mocked RPC/Auth. Not a rendered Chromium or live Supabase test; physical wrap/keyboard/focus still require real browser review.",
+  "web_version": "V0.06",
+  "environment": "LinkeDOM actual HTML + Node VM; controlled Auth, RPC and deferred responses.",
   "checks": [
     {
-      "name": "public home loads 100 tags without requesting sign-in",
+      "name": "anonymous page makes no article or access RPC and direct hash remains locked",
       "status": "PASS"
     },
     {
-      "name": "tags use varying widths and safe title text; CSS wraps equal-height tags",
+      "name": "password reveal toggles without losing value; failed login clears password",
       "status": "PASS"
     },
     {
-      "name": "load more retrieves subsequent batches of 100 then remaining articles",
+      "name": "another account cannot load any title, original or analysis",
       "status": "PASS"
     },
     {
-      "name": "reader hides raw article/notes, blocks unsafe source URL and renders text safely",
+      "name": "authorized login can open a direct private article link",
       "status": "PASS"
     },
     {
-      "name": "next article, safe original link and return position",
+      "name": "stored original is rendered as plain text and private notes stay out of reading page",
       "status": "PASS"
     },
     {
-      "name": "sort change and keyword search reset the visible result set",
+      "name": "logout clears original, analysis, titles, links and lists immediately",
       "status": "PASS"
     },
     {
-      "name": "unpublished or unavailable article shows no reader content",
+      "name": "expired session clears an existing reader without waiting for another request",
       "status": "PASS"
     },
     {
-      "name": "connection failure offers a retry action",
+      "name": "pending list response cannot restore titles after logout",
       "status": "PASS"
     },
     {
-      "name": "editor workspace starts hidden and requires login",
+      "name": "pending full-text response cannot restore the reader after logout",
       "status": "PASS"
     },
     {
-      "name": "password toggle keeps value and failed login stays private",
+      "name": "pending authorization response cannot unlock a signed-out page",
       "status": "PASS"
     },
     {
-      "name": "other registered account cannot open editor",
+      "name": "missing private migration fails closed before title or original requests",
       "status": "PASS"
     },
     {
-      "name": "designated editor can enter workspace after login",
+      "name": "back-forward cache lifecycle clears original and revalidates before restore",
       "status": "PASS"
     },
     {
-      "name": "private history restores full analysis and saved reading feeling",
-      "status": "PASS"
-    },
-    {
-      "name": "publish and unpublish controls send explicit private/public state",
-      "status": "PASS"
-    },
-    {
-      "name": "new URL clears old analysis, notes and publication state",
-      "status": "PASS"
-    },
-    {
-      "name": "draft save and subsequent AI analysis preserve reading feeling",
-      "status": "PASS"
-    },
-    {
-      "name": "logout hides and clears private content",
+      "name": "SDK stores auth in sessionStorage, discards old persistent key and uses private RPCs",
       "status": "PASS"
     }
   ]

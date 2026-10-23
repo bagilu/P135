@@ -1,89 +1,59 @@
 {
   "project": "P135",
+  "web_version": "V0.06",
   "SDS_version": "3.4",
-  "web_version": "V0.05",
-  "source_baseline": "GitHub 5824e2dd22d03c00874880c49a0e6ab230df256d (V0.04.2)",
-  "checked_at": "2026-10-23T14:46:10.548113+08:00",
-  "local_test_cases": 37,
-  "local_failures": 0,
-  "release_status": "Current frontend checks passed; SQL and Edge unchanged; live public page pending",
-  "human_reviewer": "使用者要求緊湊彩色標籤、縮小頁首、每批 100 篇捲動載入",
+  "scope": "Non-destructive private-library upgrade, login UI, original text reader and private grants",
+  "checked_at": "2026-10-23T17:29:16.341994+08:00",
+  "supabase_changes_performed": false,
   "checks": [
     {
-      "id": "QA-01",
+      "id": "PRIVATE-01",
       "status": "PASS",
-      "evidence": "全新安裝後五表 RLS 啟用；不建立 legacy schema。正式環境待執行 SQL 後核對。"
+      "evidence": "Actual local PostgreSQL upgrade preserves all articles, originals, notes, timestamps, historical snapshots and configured UID."
     },
     {
-      "id": "QA-02",
+      "id": "PRIVATE-02",
       "status": "PASS",
-      "evidence": "前端無直接 table/view .from、REST 或 GraphQL；公開與編輯資料均由 P135 RPC 提供。"
+      "evidence": "Old anonymous/authenticated public paths and snapshot direct reads denied; all reading requires the existing designated owner."
     },
     {
-      "id": "QA-03",
+      "id": "PRIVATE-03",
       "status": "PASS",
-      "evidence": "資料交換明確呼叫十一個命名 RPC 中必要項目；Auth、新聞擷取、Gemini 為獨立受控流程。"
+      "evidence": "RLS remains on; all project functions SECURITY INVOKER; no shared defaults, Auth changes or cross-project writes."
     },
     {
-      "id": "QA-04",
+      "id": "PRIVATE-04",
+      "status": "PASS",
+      "evidence": "List returns metadata only. Detail uses existing owner-only RPC; originals rendered with textContent, not HTML."
+    },
+    {
+      "id": "PRIVATE-05",
+      "status": "PASS",
+      "evidence": "Pending auth/list/detail responses cannot refill data after logout; DOM cleared on sign-out, expiry and pagehide; pageshow revalidates."
+    },
+    {
+      "id": "PRIVATE-06",
+      "status": "PASS",
+      "evidence": "New save ignores publication request. New permissions repair and fresh installation finish in private mode."
+    },
+    {
+      "id": "DEPLOY-01",
       "status": "REVIEW",
-      "evidence": "public 只放 P135 RPC，資料在 p135_data；仍須人工確認實際 Exposed Schemas 與直接 table endpoint 被 gateway 拒絕。"
+      "evidence": "Formal Supabase has not been modified. User must execute 30 migration and confirm four true results before the backend is private."
     },
     {
-      "id": "QA-05",
-      "status": "PASS",
-      "evidence": "單一初始化 transaction 建立五表、RLS／policies、最小 grants、十一 INVOKER RPC 與唯一編輯者；不依賴 shared defaults。"
-    },
-    {
-      "id": "QA-06",
-      "status": "PASS",
-      "evidence": "本次 DOM 17、分批載入 8、Chromium＋本地 PostgreSQL 12，合計 37 項。SQL／Edge 未變更，舊版 DB／Edge 報告是歷史證據，未重新計數。"
-    },
-    {
-      "id": "QA-07",
-      "status": "PASS",
-      "evidence": "公開資料另存無原文／筆記／UID 的白名單快照；RPC 明列必要欄位，無 SELECT *／to_jsonb 整列回傳。"
-    },
-    {
-      "id": "QA-08",
-      "status": "PASS",
-      "evidence": "PUBLIC EXECUTE 撤除；anon 只可呼叫三個公開 RPC。其餘均需 authenticated 並通過 owner 資格。"
-    },
-    {
-      "id": "QA-09",
-      "status": "PASS",
-      "evidence": "正式十一個 RPC 均 SECURITY INVOKER。舊 DEFINER 僅保留於 tests/fixtures 建立舊版起點，不能用於部署。"
-    },
-    {
-      "id": "QA-10",
-      "status": "PASS",
-      "evidence": "所有 ID 為 UUID，不需要 sequence grants；Edge 使用使用者 token，沒有 service_role 憑證。"
-    },
-    {
-      "id": "QA-11",
-      "status": "PASS",
-      "evidence": "Chromium 實測密碼預設遮蔽、空白鍵顯示／隱藏、Enter 登入及登出清除私有內容。"
-    },
-    {
-      "id": "QA-12",
+      "id": "DEPLOY-02",
       "status": "REVIEW",
-      "evidence": "ZIP 與新增程式沒有實際 config.js 或秘密。既有 GitHub 已追蹤 config.js，本輪保持其 blob 不變以保留部署；歷史未改寫，不能稱此項完整符合。"
-    },
-    {
-      "id": "QA-13",
-      "status": "PASS",
-      "evidence": "本次只修改前端、測試與說明。全部 SQL／Edge 逐位元組保留；不執行正式資料庫操作。"
-    },
-    {
-      "id": "QA-14",
-      "status": "REVIEW",
-      "evidence": "同名 ZIP 外層、README、config-sample.js、database、docs 齊全。本輪為功能維護包，A3 宣傳海報未另製，後續展示交付時補製。"
-    },
-    {
-      "id": "QA-15",
-      "status": "PASS",
-      "evidence": "前端版本與快取 V0.05；所有 SQL 和 Edge 與 V0.04.2 相同。已安裝環境只更新前端。"
+      "evidence": "Existing deployment config.js remains untouched in GitHub. ZIP has config-sample.js only; p135_data must remain excluded from exposed schemas."
     }
   ],
-  "supabase_changes_performed": false
+  "local_test_cases": 57,
+  "local_failures": 0,
+  "test_counts": {
+    "Database": 19,
+    "UI": 13,
+    "Pagination": 8,
+    "Browser": 17
+  },
+  "baseline": "GitHub 63f50e1be074718fceed1d55bcecd42a3d0aca03"
 }

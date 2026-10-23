@@ -1,5 +1,5 @@
 {
-  "name": "p135-v005-tests",
+  "name": "p135-v006-tests",
   "private": true,
   "scripts": {
     "test": "node database.cjs && node edge.cjs && node ui.cjs && node pagination.cjs",

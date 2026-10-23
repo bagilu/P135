@@ -1,36 +1,13 @@
-# 公開閱讀與唯一編輯者
+# P135 V0.06 私人知識庫
 
-## 訪客取得的資料
+Browser login → Supabase Auth → P135_GetLibraryAccess → owner-only library RPCs → unexposed p135_data.
 
-清單 RPC：id、標題、來源媒體、報導日期。畫面標籤僅顯示標題與日期；媒體供搜尋。
-閱讀 RPC：上述欄位及來源 URL、中性改寫、立場對調、閱讀感受、情緒分析、事實／觀點分類。
-相鄰文章 RPC：前後文章的 id、標題。
+匿名首頁只顯示登入入口，不發送文章列表、全文或分析請求。每次開頁仍向 Auth 確認使用者，後端以原有 TblP135_Settings.editor_user_id 決定唯一擁有者，不能用「登入成功」代替專案授權。
 
-三個公開 RPC 均只讀取 `p135_data.TblP135_Publications`。這張表不包含原新聞全文、私人筆記、Auth UID、Email 或人物事蹟，且 schema 不對 Data API 暴露。
-公開欄位來自編輯者明確勾選並儲存的內容快照。更改為草稿會在同一筆交易刪除公開快照，原私人文章保留。
+P135_ListLibraryArticles、P135_GetLibraryNeighbors 與既有 P135_GetArticleDetail 讀取原私人文章表。列表不回全文或筆記；單篇按需讀取。尚未分析、曾為草稿或曾公開的文章都列入同一私人收藏庫。全文用 textContent 顯示，既有分析與事實／觀點區保留。
 
-## 編輯者資格
+舊公開 RPC 全部撤銷呼叫權限，快照表本身撤權並移除寬鬆讀取 policy。快照 rows 保留為不可讀歷史資料；新儲存固定 is_published=false，不寫快照。RLS、SECURITY INVOKER、固定 search_path 與明確 grants 保留。
 
-Supabase Auth 驗證身分，`TblP135_Settings.editor_user_id` 指定唯一 P135 擁有者。登入不等於編輯權。
-本版沒有第一位登入者自動成為管理員、前端寫死 Email、依公開 API key 判定授權或讓訪客自行改權限的流程。
-編輯 RPC 與 Edge Functions 均檢查資格；工作台也檢查資格以避免載入私有內容。
-P130 處理帳號生命週期，P135 不修改 P130 的資料表、權限或 Auth 觸發器。
+沒有新增公開 bucket、匯出真實資料到 GitHub 或把新聞存到瀏覽器持久儲存。Auth 在本專案 sessionStorage，登出通知其他支援 BroadcastChannel 的分頁。離開頁面／登出／失效清除 DOM，過期非同步回應不能回填；BFCache 返回重新驗證。
 
-## RLS 與 grants
-
-五個應用表全部啟用 RLS。Settings 只有編輯者能讀取自己的授權列；私人四表採 auth.uid() 加 P135 資格的逐操作政策。
-公開快照允許 anon/authenticated SQL SELECT，但不暴露 table endpoint；只有指定編輯者可建立／更新／取消快照。
-所有業務 RPC SECURITY INVOKER，撤除 PUBLIC EXECUTE，anon 僅取得三個公開讀取函式。Edge Functions 以使用者 token 呼叫 RPC，沒有 service_role key。
-使用者已授權捨棄舊測試資料；全新安裝精確刪除原四表，不建立 legacy 備份 schema。沒有全域 default privileges 或跨 P 業務物件修改。
-
-## 解讀限制
-
-原新聞全文只在私人工作台呈現。公開頁提供原文超連結與分析，不重製全文。
-「事實與觀點」是原文陳述類型分類，不表示已完成外部查證；立場對調是模擬示例。
-所有文章內容、標題、錯誤與分析均以 DOM textContent／文字節點呈現，不執行輸入中的 HTML。
-
-## 來源文件
-
-- 本包 `SBI-P-SDS_v3.4.md`：使用者提供的正式規範。
-- [Supabase：Securing your API](https://supabase.com/docs/guides/api/securing-your-api)：grants、RLS 與未暴露資料 schema 的界線。
-- `docs/*_Test_Results.json`：本機測試證據。實際 Supabase gateway、正式 Exposed Schemas、Auth 設定及 Gemini 可用性仍需部署後驗證。
+靜態 HTML/CSS/JS 仍由公開 GitHub Pages 提供登入外殼，程式碼公開不代表文章公開。正式資料是否已關閉對外存取，必須以執行 30 私人化更新及 Supabase 實際驗收為準。GitHub 更新不能代為修改 Supabase 權限。

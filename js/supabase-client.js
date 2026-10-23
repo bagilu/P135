@@ -2,7 +2,11 @@
   'use strict';
   const config=window.APP_CONFIG;
   if(!config?.SUPABASE_URL||!config?.SUPABASE_ANON_KEY||!window.supabase)return;
-  const client=window.supabase.createClient(config.SUPABASE_URL,config.SUPABASE_ANON_KEY,{auth:{persistSession:true,storageKey:'P135-auth-token',autoRefreshToken:true}});
+  // Do not reuse the former public-site persistent login. Keep this project's session in this tab only.
+  try{window.localStorage.removeItem('P135-auth-token');}catch{}
+  const client=window.supabase.createClient(config.SUPABASE_URL,config.SUPABASE_ANON_KEY,{auth:{persistSession:true,storage:window.sessionStorage,storageKey:'P135-private-auth-v006',autoRefreshToken:true}});
+  const authChannel='BroadcastChannel' in window?new window.BroadcastChannel('P135-private-auth'):null;
+  if(authChannel)authChannel.onmessage=e=>{if(e.data?.type==='SIGN_OUT')client.auth.signOut({scope:'local'});};
   async function rpc(name,args={}){const {data,error}=await client.rpc(name,args);if(error)throw error;return data;}
   async function edge(name,payload){
     const {data:{session},error}=await client.auth.getSession();
@@ -17,12 +21,13 @@
   window.P135_API={
     async getUser(){const {data,error}=await client.auth.getUser();if(error&&error.name!=='AuthSessionMissingError')throw error;return data?.user||null;},
     signIn:(email,password)=>client.auth.signInWithPassword({email,password}),
-    signOut:()=>client.auth.signOut({scope:'local'}),
+    async signOut(){const result=await client.auth.signOut({scope:'local'});if(!result.error)authChannel?.postMessage({type:'SIGN_OUT'});return result;},
     onAuthStateChange:cb=>client.auth.onAuthStateChange(cb),
     editorStatus:()=>rpc('P135_GetEditorStatus'),
-    listPublic:({limit=40,offset=0,ascending=false,query=''}={})=>rpc('P135_ListPublicArticles',{p_limit:limit,p_offset:offset,p_ascending:ascending,p_query:query}),
-    publicDetail:id=>rpc('P135_GetPublicArticle',{p_article_id:id}),
-    publicNeighbors:(id,{ascending=false,query=''}={})=>rpc('P135_GetPublicNeighbors',{p_article_id:id,p_ascending:ascending,p_query:query}),
+    libraryAccess:()=>rpc('P135_GetLibraryAccess'),
+    listLibrary:({limit=100,offset=0,ascending=false,query=''}={})=>rpc('P135_ListLibraryArticles',{p_limit:limit,p_offset:offset,p_ascending:ascending,p_query:query}),
+    libraryDetail:id=>rpc('P135_GetArticleDetail',{p_article_id:id}),
+    libraryNeighbors:(id,{ascending=false,query=''}={})=>rpc('P135_GetLibraryNeighbors',{p_article_id:id,p_ascending:ascending,p_query:query}),
     getArticles:(limit=100,offset=0)=>rpc('P135_ListEditorArticles',{p_limit:limit,p_offset:offset}),
     getArticleDetail:id=>rpc('P135_GetArticleDetail',{p_article_id:id}),
     saveArticle:article=>rpc('P135_SaveArticle',{p_article:article}),

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>翻轉新聞｜編輯工作台</title>
-  <link rel="stylesheet" href="css/style.css?v=V0.05.1">
+  <link rel="stylesheet" href="css/style.css?v=V0.06">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
@@ -12,13 +12,13 @@
   <header class="app-header">
     <div class="brand">
       <span class="badge">P135</span>
-      <h1>翻轉新聞 · 編輯工作台</h1><a href="./" class="media-link">公開文章庫 ↗</a>
+      <h1>翻轉新聞 · 編輯工作台</h1><a href="./" class="media-link">私人文章庫 ↗</a>
     </div>
     <div class="user-status">
       <button id="btnOpenHistory" class="btn btn-secondary btn-sm">📚 歷史文章庫</button>
       <span id="userStatusText">檢查認證狀態...</span>
       <button id="authBtn" class="btn btn-sm">登入</button>
-      <span id="appVersionTag" class="version-tag">V0.05.1</span>
+      <span id="appVersionTag" class="version-tag">V0.06</span>
     </div>
   </header>
 
@@ -153,8 +153,8 @@
 
       <!-- 步驟 4: 儲存本篇完整解讀 -->
       <div class="actions">
-        <div class="publish-control"><label><input id="publishArticle" type="checkbox"> 公開這篇文章</label><p>勾選後按儲存才會公開；取消勾選並儲存即可取消公開。原新聞全文、個人筆記與事蹟庫不會公開。</p><p id="saveStatus" role="status"></p></div>
-        <button id="btnSaveAll" class="btn btn-success btn-block">💾 (4) 儲存草稿</button>
+        <div class="publish-control"><p>文章僅保存於您的私人知識庫。</p><p id="saveStatus" role="status"></p></div>
+        <button id="btnSaveAll" class="btn btn-success btn-block">💾 (4) 儲存文章</button>
       </div>
     </section>
   </main>
@@ -214,9 +214,9 @@
     </form>
   </dialog>
 
-  <!-- 快取更新：帶入 V0.05.1 -->
-  <script src="config.js?v=V0.05.1"></script>
-  <script src="js/supabase-client.js?v=V0.05.1"></script>
-  <script src="js/editor.js?v=V0.05.1"></script>
+  <!-- 快取更新：帶入 V0.06 -->
+  <script src="config.js?v=V0.06"></script>
+  <script src="js/supabase-client.js?v=V0.06"></script>
+  <script src="js/editor.js?v=V0.06"></script>
 </body>
 </html>
