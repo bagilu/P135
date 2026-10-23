@@ -1,10 +1,11 @@
-# 本機測試（非前端 build）
+# 本機測試
 
-在 tests 目錄執行 npm install，再執行 npm test。此測試使用 PGlite PostgreSQL WASM、合成 Auth fixture 與模擬外部 HTTP，不使用真實帳號或收費 AI。
-瀏覽器測試先執行 npx playwright install chromium，再執行 npm run test:browser。
-如使用另外安裝的 Chromium，可設定 P135_CHROMIUM_PATH。browser.cjs 以實際本機 PostgreSQL RPC／RLS 提供資料，只有 Auth 及 AI 外部服務是模擬。
+在 tests 目錄執行 npm install，再執行 npm test。瀏覽器測試執行 npx playwright install chromium 後執行 npm run test:browser；也可設定 P135_CHROMIUM_PATH 指向已安裝 Chromium。
 
-fixture 內的舊 DEFINER RPC 與舊 grants 只用於建立遷移前測試環境，不能當成本版正式 migration。
-測試不連正式 Supabase，也不取代正式 gateway／Exposed Schemas／Redirect／模型可用性驗證。
-測試輸出會更新 docs 的測試報告；執行之後原交付 SHA256SUMS 會因報告改變而不再相符，屬預期。
-tests/scratch 截圖為測試用途，不含真實帳號。部署網站不需要 npm、不需要 tests，也不需要這些依賴。
+本版：database 27、edge 12、ui 17、browser 12，合計 68。使用隔離 PGlite PostgreSQL、合成 Auth UID 與模擬外部 HTTP；不是正式 Supabase 部署驗收。
+
+資料庫測試覆蓋直接全新安裝、原表捨棄、失敗回復、外部依賴、其他專案不受影響、重跑保護、公開／私有 API 與 RLS。browser.cjs 以實際本地資料庫執行本版 FreshInstall，再用 RPC／RLS 供應網頁資料。
+
+fixtures 的舊 DEFINER、三表與 grants 只是舊版測試起點，不能當成正式安裝檔。所有執行均不連遠端 Supabase、不使用真實帳號或收費 AI。tests/scratch 截圖為內部測試，不包含於交付 ZIP 或 GitHub。
+
+執行測試會更新 docs 測試結果，與原 SHA256SUMS 不同屬預期。前端部署不需要 npm 或 tests。

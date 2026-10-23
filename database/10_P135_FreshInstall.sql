@@ -1,39 +1,57 @@
--- P135 V0.03 / SDS v3.4：先備份並於 staging 驗證，再核准執行。
--- 單次、原子、僅 P135 範圍。複製 legacy 資料，原表保留於未暴露的 p135_legacy；不刪資料。
--- 手動確認 p135_data 不在 Data API Exposed Schemas；public 保留 RPC。
+-- P135 V0.04：放棄舊測試資料，直接建立公開閱讀／唯一編輯者資料庫。
+-- 依使用者明確指示，只清除 public 的 P135 原三表；不清除 Auth 使用者、不操作其他 P 專案。
+-- 只供尚未安裝新版的環境；p135_data／p135_legacy 已存在時會停止，避免重跑刪除新資料。
+-- 執行前只修改下方 v_editor_user_id 的 NULL，填入 Authentication > Users 中您自己的 User UID。
+-- 核對 Data API：public 提供 RPC；p135_data 不得列入 Exposed Schemas。
 BEGIN;
-DO $guard$
-DECLARE r record; exposed text := current_setting('pgrst.db_schemas',true);
-BEGIN
-  IF to_regclass('p135_data."TblP135_Articles"') IS NOT NULL THEN
-    RAISE EXCEPTION 'V0.03 已初始化，請勿重跑；先執行 HealthCheck。';
-  END IF;
-  IF exposed IS NOT NULL AND (ARRAY['p135_data','p135_legacy'] && regexp_split_to_array(exposed,'\s*,\s*')) THEN
-    RAISE EXCEPTION 'p135_data 或 p135_legacy 已暴露給 Data API，請先完成架構審查。';
-  END IF;
-  FOR r IN SELECT c.oid,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-    WHERE n.nspname='public' AND c.relname IN ('TblP135_Articles','TblP135_Entities','TblP135_EntityEvents') AND c.relkind='r'
-  LOOP
-    IF has_table_privilege('anon',r.oid,'SELECT,INSERT,UPDATE,DELETE') OR has_table_privilege('authenticated',r.oid,'SELECT,INSERT,UPDATE,DELETE') THEN
-      RAISE EXCEPTION '舊表 % 的有效權限與交接基準不同；停止並先盤點，不自動撤權。',r.relname;
-    END IF;
-  END LOOP;
-  IF to_regclass('public."TblP135_Articles"') IS NULL OR to_regclass('public."TblP135_Entities"') IS NULL OR to_regclass('public."TblP135_EntityEvents"') IS NULL THEN
-    RAISE EXCEPTION '找不到完整的 P135 legacy 三表；本 migration 用於既有專案。';
-  END IF;
-  IF EXISTS(SELECT 1 FROM pg_depend d JOIN pg_rewrite w ON w.oid=d.objid
-    WHERE d.classid='pg_rewrite'::regclass AND d.refobjid IN (to_regclass('public."TblP135_Articles"'),to_regclass('public."TblP135_Entities"'),to_regclass('public."TblP135_EntityEvents"'))) THEN
-    RAISE EXCEPTION '偵測到依賴舊表的 View，請先人工審查，避免遺留公開資料端點';
-  END IF;
-  IF EXISTS(SELECT 1 FROM pg_constraint k WHERE k.contype='f'
-    AND k.confrelid IN (to_regclass('public."TblP135_Articles"'),to_regclass('public."TblP135_Entities"'),to_regclass('public."TblP135_EntityEvents"'))
-    AND k.conrelid NOT IN (to_regclass('public."TblP135_Articles"'),to_regclass('public."TblP135_Entities"'),to_regclass('public."TblP135_EntityEvents"'))) THEN
-    RAISE EXCEPTION '偵測到其他資料表的依賴，請先人工審查，不自動影響其他專案';
-  END IF;
-END $guard$;
 SET LOCAL lock_timeout='5s';
-LOCK TABLE public."TblP135_Articles",public."TblP135_Entities",public."TblP135_EntityEvents" IN ACCESS EXCLUSIVE MODE;
-CREATE SCHEMA IF NOT EXISTS p135_data;
+DO $install_guard$
+DECLARE
+  v_editor_user_id uuid := NULL; -- 必填：改成 '您的 User UID'::uuid
+  v_exposed text := current_setting('pgrst.db_schemas',true);
+BEGIN
+  IF v_editor_user_id IS NULL THEN
+    RAISE EXCEPTION '請先把 v_editor_user_id 的 NULL 改成您的 Auth User UID（帶引號並加 ::uuid）';
+  END IF;
+  IF NOT EXISTS(SELECT 1 FROM auth.users WHERE id=v_editor_user_id) THEN
+    RAISE EXCEPTION '指定 UID 不存在於目前 Supabase Auth；已停止，舊資料未清除';
+  END IF;
+  IF EXISTS(SELECT 1 FROM pg_namespace WHERE nspname IN ('p135_data','p135_legacy')) THEN
+    RAISE EXCEPTION '新版 P135 schema 已存在，禁止重複初始化；請執行 99 HealthCheck，勿刪 schema 重跑';
+  END IF;
+  IF v_exposed IS NOT NULL AND (ARRAY['p135_data','p135_legacy'] && regexp_split_to_array(v_exposed,'\s*,\s*')) THEN
+    RAISE EXCEPTION 'P135 資料 schema 列入 Exposed Schemas，請先核對設定；本程式不改共用 API 設定';
+  END IF;
+  IF EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='public' AND c.relkind IN ('r','p','v','m','f','S') AND left(c.relname,8)='TblP135_'
+      AND c.relname NOT IN ('TblP135_Articles','TblP135_Entities','TblP135_EntityEvents')) THEN
+    RAISE EXCEPTION '發現交接基準以外的 public P135 物件，請先人工盤點；已停止';
+  END IF;
+  IF EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+    WHERE n.nspname='public' AND left(p.proname,5)='P135_'
+      AND NOT(p.oid=ANY(array_remove(ARRAY[
+      to_regprocedure('public."P135_GetEditorStatus"()'),
+      to_regprocedure('public."P135_SaveArticle"(jsonb)'),
+      to_regprocedure('public."P135_ListEditorArticles"(integer,integer)'),
+      to_regprocedure('public."P135_GetArticleDetail"(uuid)'),
+      to_regprocedure('public."P135_ListPublicArticles"(integer,integer,boolean,text)'),
+      to_regprocedure('public."P135_GetPublicArticle"(uuid)'),
+      to_regprocedure('public."P135_GetPublicNeighbors"(uuid,boolean,text)'),
+      to_regprocedure('public."P135_AddEntityEvent"(text,text,date,text,text,text,uuid,text)'),
+      to_regprocedure('public."P135_GetEntityDossier"(uuid)'),
+      to_regprocedure('public."P135_GetArticles"(integer,integer)'),
+      to_regprocedure('public."P135_UpsertArticle"(uuid,text,text,text,date,text,text,text,jsonb,jsonb,text,text[])')
+      ],NULL)))) THEN
+    RAISE EXCEPTION '發現未知 P135 函式或多載，請先人工盤點；已停止';
+  END IF;
+  PERFORM set_config('p135.install_editor_uid',v_editor_user_id::text,true);
+END $install_guard$;
+
+-- 精確列出原三表，使用 RESTRICT：外部 View／外鍵等依賴會令整筆交易回復。
+-- 不使用 DROP SCHEMA、CASCADE、TRUNCATE 或跨專案清除。
+DROP TABLE IF EXISTS public."TblP135_EntityEvents",public."TblP135_Entities",public."TblP135_Articles" RESTRICT;
+
+CREATE SCHEMA p135_data;
 REVOKE ALL ON SCHEMA p135_data FROM PUBLIC,anon,authenticated,service_role;
 GRANT USAGE ON SCHEMA p135_data TO anon,authenticated;
 
@@ -45,6 +63,9 @@ ALTER TABLE p135_data."TblP135_Settings" ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON p135_data."TblP135_Settings" FROM PUBLIC,anon,authenticated,service_role;
 GRANT SELECT(singleton,editor_user_id) ON p135_data."TblP135_Settings" TO authenticated;
 CREATE POLICY "P135_Settings_owner_read" ON p135_data."TblP135_Settings" FOR SELECT TO authenticated USING(editor_user_id=auth.uid());
+
+INSERT INTO p135_data."TblP135_Settings"(singleton,editor_user_id)
+VALUES(true,current_setting('p135.install_editor_uid')::uuid);
 
 CREATE OR REPLACE FUNCTION public."P135_GetEditorStatus"() RETURNS boolean
 LANGUAGE sql STABLE SECURITY INVOKER SET search_path=pg_catalog,pg_temp AS $f$
@@ -88,9 +109,7 @@ CREATE POLICY "P135_TblP135_Articles_insert" ON p135_data."TblP135_Articles" FOR
 
 CREATE POLICY "P135_TblP135_Articles_update" ON p135_data."TblP135_Articles" FOR UPDATE TO authenticated USING (user_id=auth.uid() AND public."P135_GetEditorStatus"()) WITH CHECK (user_id=auth.uid() AND public."P135_GetEditorStatus"());
 
-INSERT INTO p135_data."TblP135_Articles"("id","user_id","title","source_media","source_url","published_date","original_content","neutral_content","flipped_content","sentiment_data","fact_opinion_data","personal_notes","tags","created_at","updated_at") SELECT "id","user_id","title","source_media","source_url","published_date","original_content","neutral_content","flipped_content","sentiment_data","fact_opinion_data","personal_notes","tags","created_at","updated_at" FROM public."TblP135_Articles";
 
-DO $count$ BEGIN IF (SELECT count(*) FROM p135_data."TblP135_Articles")<>(SELECT count(*) FROM public."TblP135_Articles") THEN RAISE EXCEPTION 'P135 copy count mismatch'; END IF; END $count$;
 
 CREATE TABLE p135_data."TblP135_Entities" (
   "id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -119,9 +138,7 @@ CREATE POLICY "P135_TblP135_Entities_insert" ON p135_data."TblP135_Entities" FOR
 
 CREATE POLICY "P135_TblP135_Entities_update" ON p135_data."TblP135_Entities" FOR UPDATE TO authenticated USING (user_id=auth.uid() AND public."P135_GetEditorStatus"()) WITH CHECK (user_id=auth.uid() AND public."P135_GetEditorStatus"());
 
-INSERT INTO p135_data."TblP135_Entities"("id","user_id","name","entity_type","current_role","stance_tags","summary_bio","created_at","updated_at") SELECT "id","user_id","name","entity_type","current_role","stance_tags","summary_bio","created_at","updated_at" FROM public."TblP135_Entities";
 
-DO $count$ BEGIN IF (SELECT count(*) FROM p135_data."TblP135_Entities")<>(SELECT count(*) FROM public."TblP135_Entities") THEN RAISE EXCEPTION 'P135 copy count mismatch'; END IF; END $count$;
 
 CREATE TABLE p135_data."TblP135_EntityEvents" (
   "id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -150,9 +167,7 @@ CREATE POLICY "P135_TblP135_EntityEvents_select" ON p135_data."TblP135_EntityEve
 
 CREATE POLICY "P135_TblP135_EntityEvents_insert" ON p135_data."TblP135_EntityEvents" FOR INSERT TO authenticated WITH CHECK (user_id=auth.uid() AND public."P135_GetEditorStatus"());
 
-INSERT INTO p135_data."TblP135_EntityEvents"("id","user_id","entity_id","article_id","event_date","event_type","title","description","evidence_quote","created_at") SELECT "id","user_id","entity_id","article_id","event_date","event_type","title","description","evidence_quote","created_at" FROM public."TblP135_EntityEvents";
 
-DO $count$ BEGIN IF (SELECT count(*) FROM p135_data."TblP135_EntityEvents")<>(SELECT count(*) FROM public."TblP135_EntityEvents") THEN RAISE EXCEPTION 'P135 copy count mismatch'; END IF; END $count$;
 
 CREATE TABLE p135_data."TblP135_Publications" (
   article_id uuid PRIMARY KEY REFERENCES p135_data."TblP135_Articles"(id) ON DELETE CASCADE,
@@ -323,12 +338,11 @@ BEGIN
    IF r.proname IN ('P135_ListPublicArticles','P135_GetPublicArticle','P135_GetPublicNeighbors') THEN EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO anon',sig); END IF;
  END LOOP;
 END $permissions$;
--- 已驗證複製筆數並更新 RPC，將完整原表保留於未暴露的專用備份 schema。
--- 不更改共用 public Exposed Schemas；不碰其他 P 專案物件。
-CREATE SCHEMA IF NOT EXISTS p135_legacy;
-REVOKE ALL ON SCHEMA p135_legacy FROM PUBLIC,anon,authenticated,service_role;
-ALTER TABLE public."TblP135_EntityEvents" SET SCHEMA p135_legacy;
-ALTER TABLE public."TblP135_Entities" SET SCHEMA p135_legacy;
-ALTER TABLE public."TblP135_Articles" SET SCHEMA p135_legacy;
+
 NOTIFY pgrst, 'reload schema';
 COMMIT;
+
+SELECT 'V0.04 初始化完成；舊測試資料已清除，新文章庫為空' AS installation_status,
+  to_regprocedure('public."P135_ListPublicArticles"(integer,integer,boolean,text)') IS NOT NULL AS list_rpc_exists,
+  to_regclass('p135_data."TblP135_Publications"') IS NOT NULL AS publications_table_exists,
+  EXISTS(SELECT 1 FROM p135_data."TblP135_Settings") AS editor_configured;

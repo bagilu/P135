@@ -1,19 +1,18 @@
 {
   "project": "P135",
   "SDS_version": "3.4",
-  "web_version": "V0.03",
-  "source_baseline": "GitHub 5fc4448465c5c5cdfdf3a19b5a8d8657b53d8c92 + V0.02 local transition",
-  "checked_at": "2026-10-23T12:12:07+08:00",
-  "local_test_cases": 62,
+  "web_version": "V0.04",
+  "source_baseline": "bagilu/P135 main 2a70d25e4342679f411ce3c4b84c4ce46adf82ac (V0.03) + explicit discard-test-data instruction",
+  "checked_at": "2026-10-23T05:10:07.902207+00:00",
+  "local_test_cases": 68,
   "local_failures": 0,
-  "remote_changes_performed": false,
-  "release_status": "Release candidate — live environment REVIEW items require deployment verification",
-  "human_reviewer": null,
+  "release_status": "Local checks passed; live Supabase deployment REVIEW",
+  "human_reviewer": "使用者已確認舊資料可捨棄並要求直接更新 schema 與 GitHub",
   "checks": [
     {
       "id": "QA-01",
       "status": "PASS",
-      "evidence": "本機 migration 執行後五個應用表與三個 legacy 表 RLS 開啟；正式 catalog 待部署核對。"
+      "evidence": "全新安裝後五表 RLS 啟用；不建立 legacy schema。正式環境待執行 SQL 後核對。"
     },
     {
       "id": "QA-02",
@@ -28,17 +27,17 @@
     {
       "id": "QA-04",
       "status": "REVIEW",
-      "evidence": "資料表分隔至 p135_data／p135_legacy，public 僅 RPC；實際 Dashboard Exposed Schemas 及 PostgREST table endpoint 必須在 staging／正式環境核對。"
+      "evidence": "public 只放 P135 RPC，資料在 p135_data；仍須人工確認實際 Exposed Schemas 與直接 table endpoint 被 gateway 拒絕。"
     },
     {
       "id": "QA-05",
       "status": "PASS",
-      "evidence": "五個新表在同一 migration 內具精確 grants、RLS、policies、RPC EXECUTE，未使用 shared defaults。"
+      "evidence": "單一初始化 transaction 建立五表、RLS／policies、最小 grants、十一 INVOKER RPC 與唯一編輯者；不依賴 shared defaults。"
     },
     {
       "id": "QA-06",
       "status": "PASS",
-      "evidence": "本機 PostgreSQL 已執行 anon、一般登入者、唯一 owner 的允許／拒絕案例；覆蓋公開、草稿、私人資料、跨使用者連結。"
+      "evidence": "隔離 PostgreSQL 與 Chromium 測試公開／草稿、owner／其他登入者／訪客、跨使用者拒絕與失敗原子回復。"
     },
     {
       "id": "QA-07",
@@ -53,7 +52,7 @@
     {
       "id": "QA-09",
       "status": "PASS",
-      "evidence": "本版本十一個 RPC 全採 SECURITY INVOKER；沒有 DEFINER 例外。測試 fixture 的舊 DEFINER 只用來測遷移前環境。"
+      "evidence": "正式十一個 RPC 均 SECURITY INVOKER。舊 DEFINER 僅保留於 tests/fixtures 建立舊版起點，不能用於部署。"
     },
     {
       "id": "QA-10",
@@ -68,12 +67,12 @@
     {
       "id": "QA-12",
       "status": "REVIEW",
-      "evidence": "本包無實際 config.js、真實 key／token；原遠端 Git 歷史及既有部署設定追蹤尚未改動，需另行盤點及規劃。"
+      "evidence": "ZIP 與新增程式沒有實際 config.js 或秘密。既有 GitHub 已追蹤 config.js，本輪保持其 blob 不變以保留部署；歷史未改寫，不能稱此項完整符合。"
     },
     {
       "id": "QA-13",
       "status": "PASS",
-      "evidence": "production SQL 只建立／操作 P135 名稱及專用 schema；只讀參照 auth.users 檢查指定 UID；無全域授權或跨 P 寫入。"
+      "evidence": "使用者明確放棄 P135 舊測試資料；只 DROP 精確三表 RESTRICT 並建立 P135 專用物件。外部 View／FK、未知物件、多載及重跑均測試停止；Auth 及 P101 合成資料、ACL、RLS 保持不變。"
     },
     {
       "id": "QA-14",
@@ -83,7 +82,8 @@
     {
       "id": "QA-15",
       "status": "PASS",
-      "evidence": "兩頁 Web Version 與本地 CSS/JS cache busting 均為 V0.03，不依賴既有 config.js 的舊版本值。"
+      "evidence": "兩頁顯示 V0.04，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。"
     }
-  ]
+  ],
+  "supabase_changes_performed": false
 }

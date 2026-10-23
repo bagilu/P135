@@ -1,88 +1,113 @@
 {
-  "engine": "PGlite PostgreSQL WASM; isolated local database, Supabase auth.uid stub; actual Supabase gateway not tested",
+  "web_version": "V0.04",
+  "engine": "Isolated PGlite PostgreSQL; synthetic Auth users; actual Supabase gateway not tested",
   "checks": [
     {
-      "name": "migration guard rejects unexpected legacy grants atomically",
+      "name": "missing owner UID stops before clearing original data",
       "status": "PASS"
     },
     {
-      "name": "migration stops on legacy dependent view",
+      "name": "unknown Auth UID stops without dropping original table",
       "status": "PASS"
     },
     {
-      "name": "complete atomic migration executes",
+      "name": "exposed private schema setting blocks initialization",
       "status": "PASS"
     },
     {
-      "name": "legacy preserved; copied rows start as drafts",
+      "name": "existing new schema blocks destructive action",
       "status": "PASS"
     },
     {
-      "name": "fail closed before owner setup",
+      "name": "dependent view blocks restricted drop and rolls back install",
       "status": "PASS"
     },
     {
-      "name": "owner setup requires explicit existing Auth UID",
+      "name": "other project foreign key blocks drop without cascading",
       "status": "PASS"
     },
     {
-      "name": "designated owner recognized, other login not an editor",
+      "name": "unknown P135 overload stops for review",
       "status": "PASS"
     },
     {
-      "name": "owner can list only own three migrated drafts",
+      "name": "unknown P135 table is not silently removed",
       "status": "PASS"
     },
     {
-      "name": "non-owner denied every editor and legacy write RPC",
+      "name": "clean install creates empty library and removes only old P135 tables",
       "status": "PASS"
     },
     {
-      "name": "anon cannot call editor RPC or read private/legacy tables",
+      "name": "shared Auth and other project rows, ACL, RLS and policy unchanged",
       "status": "PASS"
     },
     {
-      "name": "other authenticated sees no private rows via SQL RLS",
+      "name": "five RLS tables; eleven INVOKER RPCs; only three public APIs",
       "status": "PASS"
     },
     {
-      "name": "owner publishes three snapshots atomically",
+      "name": "designated owner ready immediately; another login is not editor",
       "status": "PASS"
     },
     {
-      "name": "public projection never returns private fields or extra AI keys",
+      "name": "empty public library loads for anonymous visitor",
       "status": "PASS"
     },
     {
-      "name": "date sorting, missing dates last and pagination",
+      "name": "anonymous cannot call editor RPC or select private article data",
       "status": "PASS"
     },
     {
-      "name": "neighbors follow active ordering and filtering",
+      "name": "ordinary registered user cannot call private editor APIs",
       "status": "PASS"
     },
     {
-      "name": "owner cannot read or attach another users article",
+      "name": "owner creates drafts and restores private notes through API",
       "status": "PASS"
     },
     {
-      "name": "unpublish removes public detail and list immediately",
+      "name": "drafts remain absent from public list and direct detail",
       "status": "PASS"
     },
     {
-      "name": "legacy private data and notes remain untouched",
+      "name": "cross-user article reads and links denied; nonowner private RLS closed",
       "status": "PASS"
     },
     {
-      "name": "all P135 RPCs INVOKER; no PUBLIC or anon editor execution",
+      "name": "owner publishes snapshots while retaining private data",
       "status": "PASS"
     },
     {
-      "name": "migration rerun aborts without replacing current data",
+      "name": "public whitelist excludes original, notes, UID and nested extras",
+      "status": "PASS"
+    },
+    {
+      "name": "date sorting, missing dates last, query and pagination work",
+      "status": "PASS"
+    },
+    {
+      "name": "neighbor APIs follow identical search and date ordering",
+      "status": "PASS"
+    },
+    {
+      "name": "owner adds entity event and retrieves private dossier",
+      "status": "PASS"
+    },
+    {
+      "name": "unpublish removes anonymous list item and direct detail immediately",
+      "status": "PASS"
+    },
+    {
+      "name": "accidental rerun preserves new articles and published content",
       "status": "PASS"
     },
     {
       "name": "permissions repair and read-only health check execute",
+      "status": "PASS"
+    },
+    {
+      "name": "installation works when original P135 tables and RPCs never existed",
       "status": "PASS"
     }
   ]

@@ -1,4 +1,5 @@
--- 在備份／staging 驗證並核准 migration 後，以 Supabase SQL Editor 管理角色執行。
+-- V0.04 的 10 已設定編輯者，一般不需執行此補設定檔；它不自動轉移既有編輯資格。
+-- 僅供已安裝但尚未指定編輯者的 P135 環境補設定。
 -- 將下一段的 NULL 改成您 Authentication > Users 的 User UID，例如 '您的UUID'::uuid。
 -- 這是資料庫端的編輯資格，不是公開 config.js 的設定。
 BEGIN;

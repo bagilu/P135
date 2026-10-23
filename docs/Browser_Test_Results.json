@@ -1,5 +1,5 @@
 {
-  "environment": "Chromium 153 + actual PGlite PostgreSQL migration/RLS/RPC via in-process bridge; mocked Auth and AI upstream only; desktop 1440px and mobile 390px. Not the deployed Supabase gateway.",
+  "environment": "Chromium 153 + actual PGlite PostgreSQL fresh install/RLS/RPC via in-process bridge; mocked Auth and AI upstream only; desktop 1440px and mobile 390px. Not the deployed Supabase gateway.",
   "checks": [
     {
       "name": "real browser anonymous RPC list loads 40 tags from actual local PostgreSQL",

@@ -1,0 +1,6 @@
+config.js
+.env
+.env.*
+tests/node_modules/
+tests/scratch/
+P135*_backup*
