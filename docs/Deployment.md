@@ -1,4 +1,4 @@
-# P135 V0.04 全新安裝
+# P135 V0.04.1 全新安裝
 
 ## 適用範圍與授權
 
@@ -22,9 +22,9 @@ Data API Exposed Schemas 中，public 依其他專案需求保留；p135_data �
 
 先暫停 P135 舊編輯操作。在正確專案 SQL Editor 開新查詢，貼入修改 UID 後的完整 10 檔並執行。
 
-一次交易的操作範圍：驗證 UID 與目標狀態 → DROP 精確三張舊 P135 表 RESTRICT → 建立 p135_data 五表、RLS、精確 grants、十一 RPC、唯一編輯者 → 通知 API schema cache → COMMIT。
+一次交易的操作範圍：驗證 UID 與目標狀態 → DROP 精確四張舊 P135 表 RESTRICT → 建立 p135_data 五表、RLS、精確 grants、十一 RPC、唯一編輯者 → 通知 API schema cache → COMMIT。
 
-刪除的原資料表只有 public.TblP135_Articles、public.TblP135_Entities、public.TblP135_EntityEvents。它們的資料不搬移；其他表不刪除。未知 P135 物件、函式多載、已存在新版 schema、外部 FK／View 等依賴或取鎖逾時會讓操作停止。失敗時先 ROLLBACK（如查詢顯示交易未結束），保留錯誤訊息檢查，不能加 CASCADE 繞過。
+刪除的原資料表只有 public.TblP135_Articles、public.TblP135_Entities、public.TblP135_EntityEvents、public.TblP135_SwapRules。它們的資料不搬移；其他表不刪除。未知 P135 物件、函式多載、已存在新版 schema、外部 FK／View 等依賴或取鎖逾時會讓操作停止。失敗時先 ROLLBACK（如查詢顯示交易未結束），保留錯誤訊息檢查，不能加 CASCADE 繞過。
 
 成功輸出三個 true。初始化已指定編輯者，一般不需另跑 20 補設定檔。**不要重跑 10 來修復其他問題。**
 
@@ -36,7 +36,7 @@ CLI 使用者也可以用 supabase/functions 多檔版部署；共用 _shared/p1
 
 ## 5. GitHub 與前端
 
-根目錄 index.html、editor.html、css/、js/ 為 V0.04。保留既有部署 config.js；更新不會重建 Supabase 專案或換 URL／公開 anon key。新環境才由 config-sample.js 建立 config.js。
+根目錄 index.html、editor.html、css/、js/ 為 V0.04.1。保留既有部署 config.js；更新不會重建 Supabase 專案或換 URL／公開 anon key。新環境才由 config-sample.js 建立 config.js。
 
 ZIP／新增程式只提供範本。既有 GitHub 曾追蹤的 config.js 需維持現有發佈相容，這次不覆蓋、不清除 Git 歷史；合規報告將此列 REVIEW。資料備份、密碼、secret 不能上傳 GitHub。
 

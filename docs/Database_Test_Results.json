@@ -1,5 +1,5 @@
 {
-  "web_version": "V0.04",
+  "web_version": "V0.04.1",
   "engine": "Isolated PGlite PostgreSQL; synthetic Auth users; actual Supabase gateway not tested",
   "checks": [
     {
@@ -27,6 +27,10 @@
       "status": "PASS"
     },
     {
+      "name": "other project FK to SwapRules aborts reset and preserves all original tables",
+      "status": "PASS"
+    },
+    {
       "name": "unknown P135 overload stops for review",
       "status": "PASS"
     },
@@ -36,6 +40,10 @@
     },
     {
       "name": "clean install creates empty library and removes only old P135 tables",
+      "status": "PASS"
+    },
+    {
+      "name": "confirmed old SwapRules table with data and its primary-key index are removed",
       "status": "PASS"
     },
     {

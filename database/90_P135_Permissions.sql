@@ -1,4 +1,4 @@
--- P135 V0.04：僅修復本版五個資料表與十一個 RPC 的精確權限。
+-- P135 V0.04.1：僅修復本版五個資料表與十一個 RPC 的精確權限。
 -- 必須先完成 10 初始化；不搬 schema、不建立資料表、不更改 RLS。
 BEGIN;
 REVOKE ALL ON SCHEMA p135_data FROM PUBLIC,anon,authenticated,service_role;

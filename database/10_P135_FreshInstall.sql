@@ -1,5 +1,5 @@
--- P135 V0.04：放棄舊測試資料，直接建立公開閱讀／唯一編輯者資料庫。
--- 依使用者明確指示，只清除 public 的 P135 原三表；不清除 Auth 使用者、不操作其他 P 專案。
+-- P135 V0.04.1：放棄舊測試資料，直接建立公開閱讀／唯一編輯者資料庫。
+-- 依使用者盤點包含 TblP135_SwapRules；只清除 public 的 P135 舊四表；不清除 Auth 使用者、不操作其他 P 專案。
 -- 只供尚未安裝新版的環境；p135_data／p135_legacy 已存在時會停止，避免重跑刪除新資料。
 -- 執行前只修改下方 v_editor_user_id 的 NULL，填入 Authentication > Users 中您自己的 User UID。
 -- 核對 Data API：public 提供 RPC；p135_data 不得列入 Exposed Schemas。
@@ -24,7 +24,7 @@ BEGIN
   END IF;
   IF EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='public' AND c.relkind IN ('r','p','v','m','f','S') AND left(c.relname,8)='TblP135_'
-      AND c.relname NOT IN ('TblP135_Articles','TblP135_Entities','TblP135_EntityEvents')) THEN
+      AND c.relname NOT IN ('TblP135_Articles','TblP135_Entities','TblP135_EntityEvents','TblP135_SwapRules')) THEN
     RAISE EXCEPTION '發現交接基準以外的 public P135 物件，請先人工盤點；已停止';
   END IF;
   IF EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
@@ -47,9 +47,9 @@ BEGIN
   PERFORM set_config('p135.install_editor_uid',v_editor_user_id::text,true);
 END $install_guard$;
 
--- 精確列出原三表，使用 RESTRICT：外部 View／外鍵等依賴會令整筆交易回復。
+-- 精確列出原四表，使用 RESTRICT：外部 View／外鍵等依賴會令整筆交易回復。
 -- 不使用 DROP SCHEMA、CASCADE、TRUNCATE 或跨專案清除。
-DROP TABLE IF EXISTS public."TblP135_EntityEvents",public."TblP135_Entities",public."TblP135_Articles" RESTRICT;
+DROP TABLE IF EXISTS public."TblP135_EntityEvents",public."TblP135_Entities",public."TblP135_Articles",public."TblP135_SwapRules" RESTRICT;
 
 CREATE SCHEMA p135_data;
 REVOKE ALL ON SCHEMA p135_data FROM PUBLIC,anon,authenticated,service_role;
@@ -342,7 +342,7 @@ END $permissions$;
 NOTIFY pgrst, 'reload schema';
 COMMIT;
 
-SELECT 'V0.04 初始化完成；舊測試資料已清除，新文章庫為空' AS installation_status,
+SELECT 'V0.04.1 初始化完成；舊測試資料已清除，新文章庫為空' AS installation_status,
   to_regprocedure('public."P135_ListPublicArticles"(integer,integer,boolean,text)') IS NOT NULL AS list_rpc_exists,
   to_regclass('p135_data."TblP135_Publications"') IS NOT NULL AS publications_table_exists,
   EXISTS(SELECT 1 FROM p135_data."TblP135_Settings") AS editor_configured;

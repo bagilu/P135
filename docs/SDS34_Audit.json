@@ -1,10 +1,10 @@
 {
   "project": "P135",
   "SDS_version": "3.4",
-  "web_version": "V0.04",
-  "source_baseline": "bagilu/P135 main 2a70d25e4342679f411ce3c4b84c4ce46adf82ac (V0.03) + explicit discard-test-data instruction",
-  "checked_at": "2026-10-23T05:10:07.902207+00:00",
-  "local_test_cases": 68,
+  "web_version": "V0.04.1",
+  "source_baseline": "GitHub main 58ab6a7b0d6c329a8c92bef59f4bb3c5b1477536 (V0.04) + user catalog confirming public.TblP135_SwapRules",
+  "checked_at": "2026-10-23T13:35:46.712497+08:00",
+  "local_test_cases": 70,
   "local_failures": 0,
   "release_status": "Local checks passed; live Supabase deployment REVIEW",
   "human_reviewer": "使用者已確認舊資料可捨棄並要求直接更新 schema 與 GitHub",
@@ -72,7 +72,7 @@
     {
       "id": "QA-13",
       "status": "PASS",
-      "evidence": "使用者明確放棄 P135 舊測試資料；只 DROP 精確三表 RESTRICT 並建立 P135 專用物件。外部 View／FK、未知物件、多載及重跑均測試停止；Auth 及 P101 合成資料、ACL、RLS 保持不變。"
+      "evidence": "依使用者授權及實際盤點，精確 DROP P135 原四表（含 SwapRules）RESTRICT；其他物件依賴 SwapRules／原文章表時交易回復。未知物件、多載與重跑仍停止；共用 Auth、P101 合成資料／ACL／RLS 保持不變。"
     },
     {
       "id": "QA-14",
@@ -82,7 +82,7 @@
     {
       "id": "QA-15",
       "status": "PASS",
-      "evidence": "兩頁顯示 V0.04，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。"
+      "evidence": "兩頁顯示 V0.04.1，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。"
     }
   ],
   "supabase_changes_performed": false

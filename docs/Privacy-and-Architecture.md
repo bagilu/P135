@@ -18,10 +18,10 @@ P130 處理帳號生命週期，P135 不修改 P130 的資料表、權限或 Aut
 
 ## RLS 與 grants
 
-五個應用表全部啟用 RLS。Settings 只有編輯者能讀取自己的授權列；私人三表採 auth.uid() 加 P135 資格的逐操作政策。
+五個應用表全部啟用 RLS。Settings 只有編輯者能讀取自己的授權列；私人四表採 auth.uid() 加 P135 資格的逐操作政策。
 公開快照允許 anon/authenticated SQL SELECT，但不暴露 table endpoint；只有指定編輯者可建立／更新／取消快照。
 所有業務 RPC SECURITY INVOKER，撤除 PUBLIC EXECUTE，anon 僅取得三個公開讀取函式。Edge Functions 以使用者 token 呼叫 RPC，沒有 service_role key。
-使用者已授權捨棄舊測試資料；全新安裝精確刪除原三表，不建立 legacy 備份 schema。沒有全域 default privileges 或跨 P 業務物件修改。
+使用者已授權捨棄舊測試資料；全新安裝精確刪除原四表，不建立 legacy 備份 schema。沒有全域 default privileges 或跨 P 業務物件修改。
 
 ## 解讀限制
 

@@ -1,8 +1,8 @@
-# P135 V0.04 — SDS v3.4 檢查報告
+# P135 V0.04.1 — SDS v3.4 檢查報告
 
-本地測試 **68 項通過，0 項失敗**：資料庫 27、Edge 12、DOM 17、Chromium 12。正式 Supabase gateway／Auth／AI 仍待部署驗收；不是正式環境已驗證的宣稱。
+本地測試 **70 項通過，0 項失敗**：資料庫 29、Edge 12、DOM 17、Chromium 12。正式 Supabase gateway／Auth／AI 仍待部署驗收；不是正式環境已驗證的宣稱。
 
-來源：GitHub main `2a70d25e4342679f411ce3c4b84c4ce46adf82ac`。使用者確認 P135 舊資料只是測試資料，可捨棄，要求直接更新；本輪改用精確刪除舊三表的全新安裝，不執行舊資料 schema 搬移。
+來源：GitHub main `58ab6a7b0d6c329a8c92bef59f4bb3c5b1477536`。使用者確認 P135 舊資料只是測試資料，可捨棄，要求直接更新；本輪改用精確刪除舊四表的全新安裝，不執行舊資料 schema 搬移。
 
 | 編號 | 狀態 | 證據與限制 |
 |---|---|---|
@@ -18,9 +18,9 @@
 | QA-10 | PASS | 所有 ID 為 UUID，不需要 sequence grants；Edge 使用使用者 token，沒有 service_role 憑證。 |
 | QA-11 | PASS | Chromium 實測密碼預設遮蔽、空白鍵顯示／隱藏、Enter 登入及登出清除私有內容。 |
 | QA-12 | REVIEW | ZIP 與新增程式沒有實際 config.js 或秘密。既有 GitHub 已追蹤 config.js，本輪保持其 blob 不變以保留部署；歷史未改寫，不能稱此項完整符合。 |
-| QA-13 | PASS | 使用者明確放棄 P135 舊測試資料；只 DROP 精確三表 RESTRICT 並建立 P135 專用物件。外部 View／FK、未知物件、多載及重跑均測試停止；Auth 及 P101 合成資料、ACL、RLS 保持不變。 |
+| QA-13 | PASS | 使用者明確放棄 P135 舊測試資料；只 DROP 精確四表 RESTRICT 並建立 P135 專用物件。外部 View／FK、未知物件、多載及重跑均測試停止；Auth 及 P101 合成資料、ACL、RLS 保持不變。 |
 | QA-14 | REVIEW | 同名 ZIP 外層、README、config-sample.js、database、docs 齊全。本輪為功能維護包，A3 宣傳海報未另製，後續展示交付時補製。 |
-| QA-15 | PASS | 兩頁顯示 V0.04，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。 |
+| QA-15 | PASS | 兩頁顯示 V0.04.1，本地 CSS／JS cache busting 同步；不採用既有 config.js 內舊版本值。 |
 
 ## 驗證內容
 
@@ -38,3 +38,7 @@
 - 既有 GitHub config.js blob 保留未改；其追蹤與歷史問題仍為 REVIEW。
 - 本輪為維護與初始化包，A3 宣傳海報未另製（QA-14 REVIEW）。
 - 已下載的資料匯出可自行留存，本版不宣稱驗證過該備份可還原，也不要求恢復舊測試資料。
+
+## V0.04.1 修正證據
+
+使用者回傳 public.TblP135_SwapRules 為額外舊測試表。本版加入已知清除清單及同筆 RESTRICT DROP，不放寬其他物件檢查。新增兩項資料庫回歸測試：SwapRules 與主鍵索引清除、其他專案外鍵依賴時全部回復。仍未代執行正式 Supabase SQL。
